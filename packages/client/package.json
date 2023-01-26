@@ -1,7 +1,7 @@
 {
   "name": "@streamerbot/client",
   "license": "MIT",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "dev": "yarn build --watch",
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "build": "tsup src/index.ts --format cjs,esm,iife --dts",
     "lint": "tsc"
   },
   "devDependencies": {
