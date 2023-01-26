@@ -1,7 +1,7 @@
 {
   "name": "@streamerbot/client",
   "license": "MIT",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
