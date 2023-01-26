@@ -1,7 +1,8 @@
 {
   "name": "@streamerbot/client",
+  "description": "Streamer.bot WebSocket client library",
   "license": "MIT",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
