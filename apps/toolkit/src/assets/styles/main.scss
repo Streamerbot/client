@@ -1,0 +1,11 @@
+$font-family: 'Poppins', sans-serif;
+
+@use 'vuetify' with (
+  $body-font-family: $font-family,
+  $heading-font-family: $font-family
+);
+
+.v-btn > .v-btn__content {
+  text-transform: none;
+  letter-spacing: normal;
+}

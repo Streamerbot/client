@@ -1,6 +1,6 @@
 {
-  "name": "streamerbot",
-  "version": "0.0.0",
+  "name": "@streamerbot/monorepo",
+  "version": "1.0.0",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -8,12 +8,13 @@
   ],
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev --parallel",
+    "dev": "turbo run dev --parallel --no-daemon",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "publish-packages": "turbo run build lint test && changeset version && changeset publish"
   },
   "devDependencies": {
-    "eslint-config-custom": "*",
+    "@changesets/cli": "^2.26.0",
     "prettier": "latest",
     "turbo": "latest"
   },
