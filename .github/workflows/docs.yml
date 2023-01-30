@@ -2,8 +2,10 @@ name: Deploy docs to Pages
 
 on:
   # Runs on pushes targeting the default branch
-  # push:
-  #   branches: ["main"]
+  push:
+    branches: ["main"]
+    paths:
+    - apps/docs
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
