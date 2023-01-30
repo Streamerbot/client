@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
-import { useStreamerbot } from '../composables/Streamerbot';
+import { useStreamerbotStore } from '../stores/streamerbot.store';
 
-const { logs } = useStreamerbot();
+const ITEM_HEIGHT = 40;
+const NUM_ITEMS = 20;
 
+const store = useStreamerbotStore();
 
 const chatHistory = computed(() => {
-  return logs.value
-    .filter(log => log.event.type === 'ChatMessage')
+  return store.logs.filter(log => log.event.type === 'ChatMessage');
 });
 
 const scrollerElement = ref<any>();
@@ -22,12 +23,12 @@ async function scrollToBottom() {
   await nextTick();
 
   scrollerElement.value.$el.dispatchEvent(new Event('scroll', { 'bubbles': true }));
-  scrollerElement.value.$el.scrollTop = scrollerElement.value.$el.scrollHeight - 48;
+  scrollerElement.value.$el.scrollTop = scrollerElement.value.$el.scrollHeight - ITEM_HEIGHT;
   scrollerElement.value.$el.scrollTop = scrollerElement.value.$el.scrollHeight;
 }
 
 function clearChat() {
-  logs.value = logs.value.filter(log => log.event.type !== 'ChatMessage');
+  store.clearLogs({ type: 'ChatMessage' });
 }
 
 function formatTime(timeStamp: string) {
@@ -51,14 +52,14 @@ function formatTime(timeStamp: string) {
         ref="scrollerElement"
         :items="chatHistory"
         item-key="id"
-        :height="48 * 10"
-        :item-height="48"
+        :height="ITEM_HEIGHT * NUM_ITEMS"
+        :item-height="ITEM_HEIGHT"
         :visible-items="50"
       >
         <template #default="{ item }">
-          <v-list-item height="48" style="max-height: 48px">
+          <v-list-item :height="ITEM_HEIGHT" class="py-0" :style="{ maxHeight: ITEM_HEIGHT }">
             <template #prepend>
-              <div class="d-flex py-1" style="height: 48px;">
+              <div class="d-flex py-1" :style="{ height: ITEM_HEIGHT }">
                 <div class="text-grey text-right mr-2" style="width: 10ch;">
                   <span>{{ formatTime(item.timeStamp) }}</span>
                 </div>
@@ -82,7 +83,7 @@ function formatTime(timeStamp: string) {
             </template>
 
             <template #default>
-              <div class="py-1" style="height: 48px">
+              <div class="py-1" :style="{ height: ITEM_HEIGHT }">
                 <span class="text-grey-lighten-2">{{ item.data.message.message }}</span>
               </div>
             </template>

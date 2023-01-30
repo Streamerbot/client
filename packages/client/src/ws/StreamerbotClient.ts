@@ -1,4 +1,4 @@
-import { StreamerbotInfo } from './types';
+import { StreamerbotAction, StreamerbotInfo } from './types';
 import {
   StreamerbotEventName,
   StreamerbotEvents,
@@ -30,8 +30,8 @@ export type StreamerbotClientOptions = {
   subscribe: StreamerbotEventsSubscription | '*';
   onConnect?: (data: StreamerbotInfo) => void;
   onDisconnect?: () => void;
-  onError?: (err: Error) => void;
-  onData?: (data: Object) => void;
+  onError?: (error: Error) => void;
+  onData?: (data: any) => void;
 };
 
 export const DefaultStreamerbotClientOptions: StreamerbotClientOptions = {
@@ -140,7 +140,6 @@ export class StreamerbotClient {
   }
 
   protected onMessage(data: MessageEvent): void {
-    console.log(data?.data);
     if (data?.data && typeof data.data === 'string') {
       const payload = JSON.parse(data.data);
 
@@ -240,25 +239,23 @@ export class StreamerbotClient {
             try {
               const payload = JSON.parse(data?.data);
               if (payload?.status === 'ok' && payload?.id === id) {
+                const response = {
+                  event: {
+                    source: 'Request',
+                    type: request.request ?? 'Unknown',
+                  },
+                  ...payload,
+                };
+
                 // onData handler
                 try {
                   if (this.options.onData) {
-                    this?.options?.onData({
-                      _time: Date.now(),
-                      event: {
-                        source: 'Request',
-                        type: request.request ?? 'Unknown',
-                      },
-                      ...payload,
-                    });
+                    this?.options?.onData(response);
                   }
                 } catch (e) {
                   console.error('Error invoking onData handler', e);
                 }
-                res({
-                  _time: Date.now(),
-                  ...payload,
-                });
+                res(response);
               }
             } catch (e) {
               rej(e);
@@ -415,9 +412,18 @@ export class StreamerbotClient {
    * Get all actions from your connected Streamer.bot instance
    */
   public async doAction(
-    id: string,
+    action: string | Partial<Pick<StreamerbotAction, 'id'|'name'>>,
     args?: Record<string, any>
   ): Promise<DoActionResponse> {
+    let id, name;
+
+    if (typeof action ==='string') {
+      id = action;
+    } else {
+      id = action.id;
+      name = action.name;
+    }
+
     return await this.request<DoActionResponse>({
       request: 'DoAction',
       action: {

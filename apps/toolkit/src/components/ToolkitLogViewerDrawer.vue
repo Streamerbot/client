@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useStreamerbot } from '../composables/Streamerbot';
+import { useStreamerbotStore } from '../stores/streamerbot.store';
 
+const store = useStreamerbotStore();
 const show = ref<boolean>(false);
-const { logs } = useStreamerbot();
 
 function formatTime(timeStamp: string) {
   return new Date(timeStamp).toLocaleTimeString();
@@ -16,7 +16,7 @@ function formatTime(timeStamp: string) {
       <v-card-title class="font-weight-light">Log Viewer</v-card-title>
       <v-divider />
       <v-card-text>
-        <div v-for="log in logs">
+        <div v-for="log in store.logs">
           <code class="text-grey-darken-1">{{ formatTime(log.timeStamp) }}</code>
           <v-divider vertical class="mx-2" />
           <code class="text-grey-lighten-1">{{ log.event.source }}</code>

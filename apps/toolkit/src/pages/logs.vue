@@ -2,9 +2,9 @@
 import { debouncedRef } from '@vueuse/shared';
 import { computed, ref } from 'vue';
 import ToolkitCodePreview from '../components/ToolkitCodePreview.vue';
-import { useStreamerbot } from '../composables/Streamerbot';
+import { useStreamerbotStore } from '../stores/streamerbot.store';
 
-const { logs } = useStreamerbot();
+const store = useStreamerbotStore();
 
 const headers = [
   { title: 'Timestamp', key: '_time', width: '175px' },
@@ -22,14 +22,14 @@ const selectedItem = ref<any>();
 const page = ref<number>(1);
 const itemsPerPage = ref<number>(25);
 const pageCount = computed(() => {
-  return (logs.value.length % itemsPerPage.value) === 0
-    ? Math.ceil(logs.value.length / itemsPerPage.value) + 1
-    : Math.ceil(logs.value.length / itemsPerPage.value)
+  return (store.logs.length % itemsPerPage.value) === 0
+    ? Math.ceil(store.logs.length / itemsPerPage.value) + 1
+    : Math.ceil(store.logs.length / itemsPerPage.value)
 });
 const paginationText = computed(() => {
   const start = ((page.value - 1) * itemsPerPage.value) + 1;
-  const end = page.value * Math.min(logs.value.length, itemsPerPage.value);
-  return `${start}-${end} of ${logs.value.length}`
+  const end = page.value * Math.min(store.logs.length, itemsPerPage.value);
+  return `${start}-${end} of ${store.logs.length}`
 })
 
 function formatTime(timestamp: string) {
@@ -57,7 +57,7 @@ function customFilter(value: any, query: string, item: any): boolean {
           v-model:page="page"
           v-model:itemsPerPage="itemsPerPage"
           :headers="headers"
-          :items="logs"
+          :items="store.logs"
           :search="debouncedSearch"
           :custom-filter="customFilter"
           filter-mode="some"

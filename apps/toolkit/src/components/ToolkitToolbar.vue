@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useStreamerbot } from '../composables/Streamerbot';
+import { useStreamerbotStore } from '../stores/streamerbot.store';
 
-const { connect, isConnecting, instance, isConnected } = useStreamerbot();
+const store = useStreamerbotStore();
 </script>
 
 <template>
@@ -16,22 +16,22 @@ const { connect, isConnecting, instance, isConnected } = useStreamerbot();
     </v-toolbar-title>
     <v-spacer />
     <v-fade-transition>
-      <template v-if="instance">
+      <template v-if="store.instance">
         <div class="d-flex text-grey-lighten-1 px-3">
-          <template v-if="instance.name && !instance.name.match(/streamer\.bot/i)">
+          <template v-if="store.instance.name && !store.instance.name.match(/streamer\.bot/i)">
             <v-divider vertical class="mx-3" />
-            <small class="text-grey-lighten-2">{{ instance.name }}</small>
+            <small class="text-grey-lighten-2">{{ store.instance.name }}</small>
           </template>
           <v-divider vertical class="mx-3" />
           <small class="text-grey-lighten-2">Streamer.bot</small>
-          <small class="ml-1"><small>v</small>{{ instance.version }}</small>
+          <small class="ml-1"><small>v</small>{{ store.instance.version }}</small>
           <v-divider vertical class="mx-3" />
-          <v-chip label :color="isConnected ? 'success' : 'error'" size="x-small">
+          <v-chip label :color="store.isConnected ? 'success' : 'error'" size="x-small">
             <Icon icon="mdi:circle-slice-8" class="mr-1" />
-            {{ isConnected ? 'Online' : 'Offline' }}
+            {{ store.isConnected ? 'Online' : 'Offline' }}
           </v-chip>
           <v-slide-x-reverse-transition leave-absolute>
-            <v-btn v-if="!isConnected" size="x-small" class="pa-0" :loading="isConnecting" @click="connect">
+            <v-btn v-if="!store.isConnected" size="x-small" class="pa-0" :loading="store.isConnecting" @click="store.connect">
               <Icon icon="mdi:refresh" />
             </v-btn>
           </v-slide-x-reverse-transition>

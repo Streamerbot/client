@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { useStreamerbot } from '../composables/Streamerbot';
+import { useStreamerbotStore } from '../stores/streamerbot.store';
 
-const { client, actions, isConnected } = useStreamerbot();
+const store = useStreamerbotStore();
 
 onMounted(async () => {
-  actions.value = (await client.value?.getActions())?.actions ?? [];
+  await store.fetchActions();
 });
 
 const selectedActionsGroup = ref<string | null>('');
 const actionsGroupMap = computed(() => {
   const map = new Map<string, any>();
-  for (const action of actions?.value ?? []) {
+  for (const action of store.actions ?? []) {
     if (!map.get(action.group)) map.set(action.group, []);
     map.get(action.group).push(action);
   }
@@ -40,7 +40,7 @@ const groupNames = computed(() => {
             >
               <v-list-item-title>View All</v-list-item-title>
               <v-list-item-subtitle>
-                <small>{{ actions?.length ?? 0 }} actions</small>
+                <small>{{ store.actions?.length ?? 0 }} actions</small>
               </v-list-item-subtitle>
               <template #append>
                 <Icon icon="mdi:chevron-right" class="text-grey" />
@@ -86,8 +86,8 @@ const groupNames = computed(() => {
                   size="small"
                   variant="tonal"
                   color="primary"
-                  :disabled="!isConnected || !action.enabled"
-                  @click="client?.doAction(action.id)"
+                  :disabled="!store.isConnected || !action.enabled"
+                  @click="store.client?.doAction(action.id)"
                 >
                   <span class="mr-1">Execute</span>
                   <Icon icon="mdi:play" />
@@ -114,8 +114,8 @@ const groupNames = computed(() => {
                     size="small"
                     variant="tonal"
                     color="primary"
-                    :disabled="!isConnected || !action.enabled"
-                    @click="client?.doAction(action.id)"
+                    :disabled="!store.isConnected || !action.enabled"
+                    @click="store.client?.doAction(action.id)"
                   >
                     <span class="mr-1">Execute</span>
                     <Icon icon="mdi:play" />

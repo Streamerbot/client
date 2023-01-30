@@ -5,4 +5,5 @@ export * from './StreamerbotEventTypes';
 export * from './StreamerbotInfoTypes';
 export * from './StreamerbotResponseTypes';
 export * from './StreamerbotViewerTypes';
+export * from './WebSocketTypes';
 

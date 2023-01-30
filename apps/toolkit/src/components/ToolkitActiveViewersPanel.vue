@@ -1,21 +1,17 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { useStreamerbot } from '../composables/Streamerbot';
+import { useStreamerbotStore } from '../stores/streamerbot.store';
 
-const { client, activeViewers } = useStreamerbot();
+const store = useStreamerbotStore();
 
-onMounted(() => updateViewers());
-
-async function updateViewers() {
-  activeViewers.value = (await client.value?.getActiveViewers())?.viewers;
-}
+onMounted(() => store.fetchActiveViewers());
 </script>
 
 <template>
   <v-card>
     <v-card-title class="font-weight-light d-flex">
       <span>Active Viewers</span>
-      <v-btn icon size="x-small" variant="tonal" color="primary" class="ml-auto" @click="updateViewers">
+      <v-btn icon size="x-small" variant="tonal" color="primary" class="ml-auto" @click="store.fetchActiveViewers">
         <v-icon>mdi-refresh</v-icon>
       </v-btn>
     </v-card-title>
@@ -23,7 +19,7 @@ async function updateViewers() {
     <v-card-text class="pa-0">
       <v-list density="compact">
         <v-list-item
-          v-for="viewer in activeViewers"
+          v-for="viewer in store.activeViewers"
           :key="viewer.id"
         >
           <v-list-item-title>{{ viewer.display }}</v-list-item-title>

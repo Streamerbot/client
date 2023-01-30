@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { useStreamerbot } from '../composables/Streamerbot';
+import { useStreamerbotStore } from '../stores/streamerbot.store';
 import ToolkitCodePreview from './ToolkitCodePreview.vue';
 
+const store = useStreamerbotStore();
 const show = ref<boolean>(true);
-const { logs } = useStreamerbot();
 
 const actionsHistory = computed(() => {
   const map = new Map<string, any[]>();
-  logs.value
+  store.logs
     .filter(log => log.event.source === 'Raw' && ['Action', 'ActionCompleted', 'SubAction'].includes(log.event.type))
     .reverse()
     .forEach((log) => {

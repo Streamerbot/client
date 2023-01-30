@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { z } from 'zod';
-import { useStreamerbot } from '../composables/Streamerbot';
+import { useStreamerbotStore } from '../stores/streamerbot.store';
 
-const { host, port, endpoint, connect, isConnecting, error } = useStreamerbot();
+const store = useStreamerbotStore();
 
 const schema = z.object({
   host: z.string({ invalid_type_error: 'Host must be a string' }).min(1),
@@ -16,13 +16,13 @@ const zodErrors = computed(() => {
   return zodResult.value?.error?.format();
 });
 
-watch([ host, port, endpoint ], () => validate(), { immediate: true });
+watch([() => store.host, () => store.port, () => store.endpoint], () => validate(), { immediate: true });
 
 function validate() {
   zodResult.value = schema.safeParse({
-    host: host.value,
-    port: port.value,
-    endpoint: endpoint.value
+    host: store.host,
+    port: store.port,
+    endpoint: store.endpoint,
   });
 
   return zodResult.value;
@@ -32,9 +32,9 @@ function validate() {
 <template>
   <v-slide-y-transition leave-absolute>
     <v-alert
-      v-if="error"
+      v-if="store.error"
       title="WebSocket Error"
-      :text="error"
+      :text="store.error"
       :icon="false"
       type="error"
       variant="tonal"
@@ -45,7 +45,7 @@ function validate() {
 
   <v-slide-y-transition leave-absolute>
     <v-alert
-      v-if="host !== '127.0.0.1'"
+      v-if="store.host !== '127.0.0.1'"
       :text="`Hosts other than localhost (127.0.0.1) are not officially supported and should be used by advanced users only.`"
       :icon="false"
       type="warning"
@@ -56,7 +56,7 @@ function validate() {
   </v-slide-y-transition>
 
   <v-text-field
-    v-model="host"
+    v-model="store.host"
     :error-messages="zodErrors?.host?._errors"
     label="Host"
     variant="filled"
@@ -65,7 +65,7 @@ function validate() {
     class="mb-3"
   />
   <v-text-field
-    v-model.number="port"
+    v-model.number="store.port"
     :error-messages="zodErrors?.port?._errors"
     label="Port"
     variant="filled"
@@ -75,7 +75,7 @@ function validate() {
     class="mb-3"
   />
   <v-text-field
-    v-model="endpoint"
+    v-model="store.endpoint"
     :error-messages="zodErrors?.endpoint?._errors"
     label="Endpoint"
     variant="filled"
@@ -90,9 +90,9 @@ function validate() {
     variant="tonal"
     size="large"
     class="mt-5"
-    :disabled="zodResult?.error"
-    :loading="isConnecting"
-    @click.prevent="connect"
+    :disabled="!!zodResult?.error"
+    :loading="store.isConnecting"
+    @click.prevent="store.connect"
   >Connect</v-btn>
 </template>
 

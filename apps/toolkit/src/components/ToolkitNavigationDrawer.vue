@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { useStreamerbot } from '../composables/Streamerbot';
+import { useStreamerbotStore } from '../stores/streamerbot.store';
 
-const { logs, actions, variables } = useStreamerbot();
+const store = useStreamerbotStore();
 const activeItem = ref(0);
 
 const items = computed(() => [
@@ -15,19 +15,19 @@ const items = computed(() => [
     title: 'Actions',
     icon: 'mdi:lightning-bolt',
     to: '/actions',
-    badge: actions.value?.length ?? 0,
+    badge: store.actions?.length ?? 0,
   },
   {
     title: 'Variables',
     icon: 'mdi:application-variable-outline',
     to: '/variables',
-    badge: variables.value?.length ?? 0,
+    badge: store.variables?.length ?? 0,
   },
   {
     title: 'Logs',
     icon: 'mdi:note-multiple',
     to: '/logs',
-    badge: logs.value?.length ?? 0,
+    badge: store.logs?.length ?? 0,
   },
   {
     title: 'Settings',

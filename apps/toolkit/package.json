@@ -11,9 +11,11 @@
   "dependencies": {
     "@mdi/font": "^7.1.96",
     "@streamerbot/client": "*",
+    "@streamerbot/vue": "*",
     "@vueuse/core": "^9.11.1",
     "pinia": "^2.0.29",
     "prismjs": "^1.29.0",
+    "timestamp-nano": "^1.0.1",
     "uuid": "^9.0.0",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6",
