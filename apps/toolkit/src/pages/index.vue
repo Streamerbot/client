@@ -1,9 +1,14 @@
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import ToolkitActiveViewersPanel from '../components/ToolkitActiveViewersPanel.vue';
 import ToolkitChatPanel from '../components/ToolkitChatPanel.vue';
 import { useStreamerbotStore } from '../stores/streamerbot.store';
 
 const store = useStreamerbotStore();
+
+onMounted(() => {
+  if (!store.broadcasterAvatar) store.fetchAvatar();
+});
 </script>
 
 <template>
