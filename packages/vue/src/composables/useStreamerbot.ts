@@ -21,7 +21,7 @@ export type UseStreamerbotReturn = {
 export function useStreamerbot(options: Partial<UseStreamerbotOptions>): UseStreamerbotReturn {
   const data = ref();
   const status = ref<WebSocketStatus>('CLOSED');
-  const error = ref();
+  const error = ref<string>();
   const clientRef = ref<StreamerbotClient>();
 
   function onConnect(data: StreamerbotInfo) {
