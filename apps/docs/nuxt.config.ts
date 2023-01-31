@@ -8,9 +8,5 @@ export default defineNuxtConfig({
   },
   colorMode: {
     preference: 'dark',
-  },
-  sourcemap: {
-    "server": false,
-    "client": false
   }
 });

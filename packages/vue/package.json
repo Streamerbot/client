@@ -1,6 +1,6 @@
 {
   "name": "@streamerbot/vue",
-  "version": "0.9.2",
+  "version": "0.9.4",
   "description": "Streamer.bot Vue Composition Utilities",
   "author": "Whipstickgostop <https://github.com/whiptsickgostop>",
   "license": "MIT",
@@ -17,7 +17,6 @@
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",
-  "browser": "dist/index.global.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
