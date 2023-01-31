@@ -18,7 +18,7 @@ export type UseStreamerbotReturn = {
   client: Ref<StreamerbotClient | undefined>;
 }
 
-export function useStreamerbot(options: Partial<UseStreamerbotOptions>): UseStreamerbotReturn {
+export function useStreamerbot(options: Partial<UseStreamerbotOptions> = {}): UseStreamerbotReturn {
   const data = ref();
   const status = ref<WebSocketStatus>('CLOSED');
   const error = ref<string>();
@@ -68,10 +68,10 @@ export function useStreamerbot(options: Partial<UseStreamerbotOptions>): UseStre
       status.value = 'CONNECTING';
 
     const client = new StreamerbotClient({
-      host: unref(options.host),
-      port: unref(options.port),
-      endpoint: unref(options.endpoint),
-      immediate: immediate || unref(options.immediate),
+      host: unref(options.host) ?? '127.0.0.1',
+      port: unref(options.port) ?? 8080,
+      endpoint: unref(options.endpoint) ?? '/',
+      immediate: (immediate || unref(options.immediate)) ?? true,
       subscribe: unref(options.subscribe),
       autoReconnect: unref(options.autoReconnect) ?? true,
       retries: unref(options.retries) ?? -1,
