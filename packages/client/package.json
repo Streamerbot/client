@@ -1,6 +1,6 @@
 {
   "name": "@streamerbot/client",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Streamer.bot WebSocket client library",
   "author": "Whipstickgostop <https://github.com/whiptsickgostop>",
   "license": "MIT",
