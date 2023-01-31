@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { watch } from 'vue';
 import { StreamerbotEventName, StreamerbotEvents } from '@streamerbot/client';
 import { useStreamerbot } from '@streamerbot/vue';
 
