@@ -23,5 +23,12 @@ export default defineAppConfig({
       showLinkIcon: true,
       exclude: [],
     },
+    github: {
+      dir: 'apps/docs/content',
+      branch: 'main',
+      repo: 'client',
+      owner: 'Streamerbot',
+      edit: true,
+    },
   },
 });

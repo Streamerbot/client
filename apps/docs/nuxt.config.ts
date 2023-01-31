@@ -3,4 +3,7 @@ export default defineNuxtConfig({
   app: {
     baseURL: '/client/',
   },
+  colorMode: {
+    preference: 'dark',
+  },
 });

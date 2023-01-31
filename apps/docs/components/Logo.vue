@@ -2,10 +2,10 @@
 </script>
 
 <template>
-  <a>
+  <NuxtLink to="/">
     <img src="https://streamer.bot/logo-transparent.svg" width="26" />
     <span>Streamer.bot <span>Client</span></span>
-  </a>
+  </NuxtLink>
 </template>
 
 <style lang="ts" scoped>
