@@ -3,10 +3,16 @@ import { StreamerbotEventName, StreamerbotEvents } from '@streamerbot/client';
 import { useStreamerbot } from '@streamerbot/vue';
 
 const { client, status, connect, disconnect, data } = useStreamerbot({
-  immediate: true,
+  immediate: false,
   autoReconnect: false,
   subscribe: '*'
 });
+
+onMounted(() => {
+  if (process.client) {
+    connect();
+  }
+})
 
 const selectedSource = ref<keyof typeof StreamerbotEvents>('Twitch');
 const selectedEvent = ref<string>('ChatMessage');
@@ -35,9 +41,9 @@ watch(data, (val) => {
 
 const codeSnippet = computed<string>(() => {
   return `
-  client.on("${selectedSource.value}.${selectedEvent.value}", (data) => {
-    console.log(data);
-  });
+    client.on("${selectedSource.value}.${selectedEvent.value}", (data) => {
+      console.log(data);
+    });
   `
 });
 </script>
