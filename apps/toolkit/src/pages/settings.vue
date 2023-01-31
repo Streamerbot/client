@@ -10,7 +10,7 @@ const store = useStreamerbotStore();
     <v-toolbar v-if="store.instance" flat color="surface" class="rounded-t-lg bg mb-3" height="100">
       <v-toolbar-title class="d-flex flex-column">
         <span class="d-flex align-center">
-          <span>{{ store.instance.name }}</span>
+          <span>{{ store.instance.name ?? 'Streamer.bot' }}</span>
           <v-chip label :color="store.isConnected ? 'success' : 'error'" size="small" class="mx-3 mb-1 font-weight-bold">
             <Icon icon="mdi:circle-slice-8" class="mr-1" />
             {{ store.isConnected ? 'Online' : 'Offline' }}
@@ -32,6 +32,8 @@ const store = useStreamerbotStore();
       </v-toolbar-title>
       <v-spacer />
     </v-toolbar>
+
+    {{ store.status }}
 
     <v-row>
       <v-col cols="12" lg="6" xl="4">

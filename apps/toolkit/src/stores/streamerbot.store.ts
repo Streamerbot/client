@@ -19,7 +19,7 @@ export const useStreamerbotStore = defineStore('streamerbot', () => {
     host,
     port,
     endpoint,
-    immediate: false,
+    immediate: !isNewConnection.value,
     subscribe: '*',
     onConnect,
   });
@@ -27,12 +27,21 @@ export const useStreamerbotStore = defineStore('streamerbot', () => {
   const isConnecting = computed(() => status.value === 'CONNECTING');
 
   // Client Data
-  const instance = ref<StreamerbotInfo>();
-  const actions = ref<Array<StreamerbotAction>>();
+  const instance = useStorage<Partial<StreamerbotInfo>>('sb:toolkit:instance', {
+    instanceId: undefined,
+    name: undefined,
+    os: undefined,
+    version: undefined
+  }, localStorage, { mergeDefaults: true });
+  const actions = useStorage<Array<StreamerbotAction>>('sb:toolkit:actions', []);
   const variables = ref<Array<unknown>>();
   const activeViewers = ref<Array<StreamerbotViewer>>();
-  const broadcaster = ref<GetBroadcasterResponse>();
-  const broadcasterAvatar = ref<string>();
+  const broadcaster = useStorage<Partial<GetBroadcasterResponse>>('sb:toolkit:broadcaster', {
+    platforms: undefined,
+    connected: [],
+    disconnected: []
+  }, localStorage, { mergeDefaults: true });
+  const broadcasterAvatar = useStorage<string | null>('sb:toolkit:avatar', null);
 
   // Logger Data
   const logs = useStorage<
@@ -50,7 +59,7 @@ export const useStreamerbotStore = defineStore('streamerbot', () => {
 
   async function onConnect(data: StreamerbotInfo) {
     // save instance info
-    instance.value = data;
+    instance.value = (data && data.instanceId) ? data : instance.value;
 
     // load data
     actions.value = (await client.value?.getActions())?.actions ?? [];
@@ -113,6 +122,7 @@ export const useStreamerbotStore = defineStore('streamerbot', () => {
   });
 
   return {
+    status,
     host,
     port,
     endpoint,

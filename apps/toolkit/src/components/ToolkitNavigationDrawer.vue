@@ -7,9 +7,14 @@ const activeItem = ref(0);
 
 const items = computed(() => [
   {
-    title: 'Dashboard',
-    icon: 'mdi:view-dashboard',
+    title: 'Overview',
+    icon: 'mdi:help-circle-outline',
     to: '/',
+  },
+  {
+    title: 'Broadcast Dashboard',
+    icon: 'mdi:view-dashboard',
+    to: '/broadcast',
   },
   {
     title: 'Actions',

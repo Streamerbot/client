@@ -39,9 +39,8 @@ function formatTime(timestamp: string) {
 function customFilter(value: any, query: string, item: any): boolean {
   if (!query) return true;
 
-  if (typeof value?._search === 'string') {
-    console.log(value?._search, query, value?._search.match(new RegExp(`${query}`, 'gi')), value?._search.match(new RegExp(`${query}`, 'gi')) ? true : false);
-    return value?._search.match(new RegExp(`${query}`, 'gi')) ? true : false;
+  if (typeof value?.title === 'string') {
+    return value?.title.match(new RegExp(`${query}`, 'gi')) ? true : false;
   }
 
   return false;
@@ -61,6 +60,7 @@ function customFilter(value: any, query: string, item: any): boolean {
           :search="debouncedSearch"
           :custom-filter="customFilter"
           filter-mode="some"
+          item-title="_search"
           density="compact"
           must-sort
         >

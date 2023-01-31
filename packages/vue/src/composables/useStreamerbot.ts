@@ -26,6 +26,7 @@ export function useStreamerbot(options: Partial<UseStreamerbotOptions>): UseStre
 
   function onConnect(data: StreamerbotInfo) {
     status.value = 'OPEN';
+    error.value = undefined;
     let cb = unref(options.onConnect);
     if (cb) cb(data);
   }
@@ -72,23 +73,14 @@ export function useStreamerbot(options: Partial<UseStreamerbotOptions>): UseStre
       endpoint: unref(options.endpoint),
       immediate: immediate || unref(options.immediate),
       subscribe: unref(options.subscribe),
+      autoReconnect: unref(options.autoReconnect) ?? true,
+      retries: unref(options.retries) ?? -1,
       onConnect,
       onDisconnect,
       onError,
       onData
     });
     clientRef.value = client;
-
-    console.log(client, {
-      host: unref(options.host),
-      port: unref(options.port),
-      endpoint: unref(options.endpoint),
-      immediate: unref(options.immediate),
-      onConnect,
-      onDisconnect,
-      onError,
-      onData,
-    });
   }
 
   if (unref(options.immediate))

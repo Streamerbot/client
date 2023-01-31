@@ -11,7 +11,7 @@ const store = useStreamerbotStore();
   <v-app>
     <ToolkitToolbar />
 
-    <template v-if="store.isConnected && store.instance">
+    <template v-if="(store.isConnected || !store.isNewConnection) && store.instance">
       <ToolkitNavigationDrawer />
       <v-main>
         <RouterView />

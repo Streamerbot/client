@@ -27,6 +27,8 @@ export type StreamerbotClientOptions = {
   port: number;
   endpoint: string;
   immediate: boolean;
+  autoReconnect: boolean;
+  retries: number;
   subscribe: StreamerbotEventsSubscription | '*';
   onConnect?: (data: StreamerbotInfo) => void;
   onDisconnect?: () => void;
@@ -39,6 +41,8 @@ export const DefaultStreamerbotClientOptions: StreamerbotClientOptions = {
   port: 8080,
   endpoint: '/',
   immediate: true,
+  autoReconnect: true,
+  retries: -1,
   subscribe: {},
 } as const;
 
@@ -52,6 +56,9 @@ export class StreamerbotClient {
   }> = [];
   protected subscriptions: StreamerbotEventsSubscription = {};
 
+  protected explicitlyClosed = false;
+  protected retried = 0;
+
   public constructor(
     options: Partial<StreamerbotClientOptions> = DefaultStreamerbotClientOptions
   ) {
@@ -63,19 +70,11 @@ export class StreamerbotClient {
   }
 
   /**
-   * Returns true if WebSocket readyState is `OPEN`
-   */
-  public get isConnected(): boolean {
-    return this.socket?.readyState === this.socket?.OPEN;
-  }
-
-  /**
    * Connect to a Streamer.bot WebSocket server
    */
   public async connect(): Promise<void> {
-    if (this.socket) {
-      await this.disconnect();
-    }
+    this.disconnect();
+    this.explicitlyClosed = false;
 
     try {
       this.socket = new WebSocket(
@@ -86,10 +85,10 @@ export class StreamerbotClient {
       this.socket.onerror = this.onError.bind(this);
       this.socket.onmessage = this.onMessage.bind(this);
     } catch (error) {
-      await this.disconnect();
+      this.disconnect();
 
       try {
-        if (this.options.onError) this?.options?.onError(error as Error);
+        this?.options?.onError?.(error as Error);
       } catch (e) {
         console.error('Error invoking onError handler', e);
       }
@@ -101,27 +100,30 @@ export class StreamerbotClient {
   /**
    * Disconnect Streamer.bot WebSocket
    */
-  public async disconnect(): Promise<void> {
+  public disconnect(code: number = 1000): void {
     if (!this.socket || this.socket.readyState === this.socket.CLOSED) {
       return;
     }
 
-    this.socket.close();
+    this.socket.close(code);
+    this.explicitlyClosed = true;
 
     try {
-      if (this.options.onDisconnect) this?.options?.onDisconnect();
+      this?.options?.onDisconnect?.();
     } catch (e) {
       console.error('Error invoking onDisconnect handler', e);
     }
   }
 
   protected async onOpen(): Promise<void> {
+    this.retried = 0;
+
     try {
       if (this.options.subscribe) {
         await this.subscribe(this.options.subscribe);
       }
       const infoResponse = await this.getInfo();
-      if (this.options.onConnect) this?.options?.onConnect(infoResponse.info);
+      this?.options?.onConnect?.(infoResponse.info);
     } catch (e) {
       console.error('Error invoking onOpen handler', e);
     }
@@ -131,12 +133,24 @@ export class StreamerbotClient {
     try {
       if ((event.type === 'error' || !event.wasClean) && this.options.onError)
         this?.options?.onError(new Error(getCloseEventReason(event)));
-      if (this.options.onDisconnect) this?.options?.onDisconnect();
+      this?.options?.onDisconnect?.();
     } catch (e) {
       console.error('Error invoking onDisconnect handler', e);
     }
 
-    this.cleanup();
+    if (!this.explicitlyClosed && this.options.autoReconnect) {
+      this.retried += 1;
+
+      if (typeof this.options.retries === 'number' && (this.options.retries < 0 || this.retried < this.options.retries))
+        setTimeout(() => {
+          console.log(`Reconnecting... (attempt ${this.retried})`);
+          this.connect();
+        }, 1000);
+      else this.cleanup();
+    } else {
+      console.log('Explicitly closed, cleaning up...', this.explicitlyClosed, this.options.autoReconnect);
+      this.cleanup();
+    }
   }
 
   protected onMessage(data: MessageEvent): void {
@@ -180,8 +194,7 @@ export class StreamerbotClient {
   protected onError(event: Event): void {
     console.error('WebSocket Error', event);
     try {
-      if (this.options.onError)
-        this?.options?.onError(new Error('WebSocket Error'));
+      this?.options?.onError?.(new Error('WebSocket Error'));
     } catch (e) {
       console.error('Error invoking onError handler', e);
     }
@@ -196,6 +209,7 @@ export class StreamerbotClient {
     this.socket.onmessage = null;
     this.listeners = [];
     this.socket = undefined;
+    this.retried = 0;
   }
 
   /**
@@ -412,12 +426,12 @@ export class StreamerbotClient {
    * Get all actions from your connected Streamer.bot instance
    */
   public async doAction(
-    action: string | Partial<Pick<StreamerbotAction, 'id'|'name'>>,
+    action: string | Partial<Pick<StreamerbotAction, 'id' | 'name'>>,
     args?: Record<string, any>
   ): Promise<DoActionResponse> {
     let id, name;
 
-    if (typeof action ==='string') {
+    if (typeof action === 'string') {
       id = action;
     } else {
       id = action.id;
