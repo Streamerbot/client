@@ -33,7 +33,7 @@
     "dev": "yarn build --watch",
     "build": "tsup",
     "lint": "tsc",
-    "prepublishOnly": "yarn build && yarn build:browser"
+    "prepublishOnly": "yarn build"
   },
   "devDependencies": {
     "tsup": "^6.5.0",
