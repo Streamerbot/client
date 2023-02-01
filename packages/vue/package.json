@@ -1,6 +1,6 @@
 {
   "name": "@streamerbot/vue",
-  "version": "0.9.4",
+  "version": "1.0.0",
   "description": "Streamer.bot Vue Composition Utilities",
   "author": "Whipstickgostop <https://github.com/whiptsickgostop>",
   "license": "MIT",
