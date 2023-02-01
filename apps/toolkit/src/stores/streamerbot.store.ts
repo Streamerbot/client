@@ -8,6 +8,8 @@ import { computed, ref, watch } from 'vue';
 
 export const useStreamerbotStore = defineStore('streamerbot', () => {
 
+  const MAX_LOGS_LENGTH = 1000;
+
   // Configuration (LocalStorage)
   const host = useStorage('sb:toolkit:host', DefaultStreamerbotClientOptions.host);
   const port = useStorage('sb:toolkit:port', DefaultStreamerbotClientOptions.port);
@@ -118,6 +120,10 @@ export const useStreamerbotStore = defineStore('streamerbot', () => {
       val._search = `${val.event.source} - ${val.event.type}`;
 
       logs.value.push(val);
+    }
+
+    if (logs.value?.length > MAX_LOGS_LENGTH) {
+      logs.value.slice(-MAX_LOGS_LENGTH);
     }
   });
 
