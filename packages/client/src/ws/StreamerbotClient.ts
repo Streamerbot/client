@@ -1,3 +1,4 @@
+import WebSocket from 'isomorphic-ws';
 import { StreamerbotAction, StreamerbotInfo } from './types';
 import {
   StreamerbotEventName,
@@ -141,14 +142,21 @@ export class StreamerbotClient {
     if (!this.explicitlyClosed && this.options.autoReconnect) {
       this.retried += 1;
 
-      if (typeof this.options.retries === 'number' && (this.options.retries < 0 || this.retried < this.options.retries))
+      if (
+        typeof this.options.retries === 'number' &&
+        (this.options.retries < 0 || this.retried < this.options.retries)
+      )
         setTimeout(() => {
           console.log(`Reconnecting... (attempt ${this.retried})`);
           this.connect();
         }, 1000);
       else this.cleanup();
     } else {
-      console.log('Explicitly closed, cleaning up...', this.explicitlyClosed, this.options.autoReconnect);
+      console.log(
+        'Explicitly closed, cleaning up...',
+        this.explicitlyClosed,
+        this.options.autoReconnect
+      );
       this.cleanup();
     }
   }
@@ -203,10 +211,10 @@ export class StreamerbotClient {
   protected cleanup(): void {
     if (!this.socket) return;
 
-    this.socket.onopen = null;
-    this.socket.onclose = null;
-    this.socket.onerror = null;
-    this.socket.onmessage = null;
+    this.socket.onopen = undefined;
+    this.socket.onclose = undefined;
+    this.socket.onerror = undefined;
+    this.socket.onmessage = undefined;
     this.listeners = [];
     this.socket = undefined;
     this.retried = 0;
@@ -249,7 +257,7 @@ export class StreamerbotClient {
         // attach event listener for our specific request id
         this.socket?.addEventListener(
           'message',
-          (data) => {
+          (data: any) => {
             try {
               const payload = JSON.parse(data?.data);
               if (payload?.status === 'ok' && payload?.id === id) {

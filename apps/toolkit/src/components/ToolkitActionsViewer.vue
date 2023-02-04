@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useStreamerbotStore } from '../stores/streamerbot.store';
 
 const store = useStreamerbotStore();
 
-onMounted(async () => {
-  await store.fetchActions();
-});
+watch(() => store.isConnected, async (val) => {
+  if (val) {
+    await store.fetchActions();
+  }
+}, { immediate: true });
 
 const selectedActionsGroup = ref<string | null>('');
 const actionsGroupMap = computed(() => {

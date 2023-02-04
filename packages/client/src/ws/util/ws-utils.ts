@@ -1,3 +1,5 @@
+import crypto from 'isomorphic-webcrypto';
+
 export function generateRequestId() {
   return `sb:client:req:${Date.now()}-${crypto.getRandomValues(new Uint32Array(12))[0]}`;
 }

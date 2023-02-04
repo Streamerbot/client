@@ -9,5 +9,5 @@ export default defineConfig({
   globalName: 'Streamerbot',
   minify: true,
   shims: true,
-  platform: 'browser'
+  platform: 'browser',
 });
