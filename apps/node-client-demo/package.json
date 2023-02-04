@@ -1,0 +1,16 @@
+{
+  "name": "@streamerbot/node-client-demo",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "devDependencies": {},
+  "dependencies": {
+    "@streamerbot/client": "*",
+    "nodemon": "^2.0.20"
+  }
+}
