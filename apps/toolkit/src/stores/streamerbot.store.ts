@@ -85,7 +85,7 @@ export const useStreamerbotStore = defineStore('streamerbot', () => {
   }
 
   async function fetchAvatar(username: string = '') {
-    if (!username) return;
+    if (!username || broadcasterAvatar.value) return;
     const res = await fetch(`https://decapi.me/twitch/avatar/${username}`, {
       mode: 'cors',
       credentials: 'omit',

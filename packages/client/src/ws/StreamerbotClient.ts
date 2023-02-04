@@ -73,47 +73,100 @@ export class StreamerbotClient {
   /**
    * Connect to a Streamer.bot WebSocket server
    */
-  public async connect(): Promise<void> {
-    this.disconnect();
+  public async connect(timeout: number = 10_000): Promise<void> {
+    await this.disconnect();
     this.explicitlyClosed = false;
 
-    try {
-      this.socket = new WebSocket(
-        `ws://${this.options.host}:${this.options.port}${this.options.endpoint}`
-      );
-      this.socket.onopen = this.onOpen.bind(this);
-      this.socket.onclose = this.onClose.bind(this);
-      this.socket.onerror = this.onError.bind(this);
-      this.socket.onmessage = this.onMessage.bind(this);
-    } catch (error) {
-      this.disconnect();
+    const controller = new AbortController();
+    const signal = controller.signal;
+    let timer: NodeJS.Timeout;
 
-      try {
-        this?.options?.onError?.(error as Error);
-      } catch (e) {
-        console.error('Error invoking onError handler', e);
-      }
+    return await Promise.race([
+      new Promise<void>(
+        (res, rej) =>
+          (timer = setTimeout(() => {
+            controller.abort();
+            return rej({
+              message: 'Timeout exceeded connecting to Streamer.bot WebSocket server',
+            });
+          }, timeout))
+      ),
+      new Promise<void>(async (res, rej) => {
+        try {
+          this.socket = new WebSocket(
+            `ws://${this.options.host}:${this.options.port}${this.options.endpoint}`
+          );
 
-      throw error;
-    }
+          this.socket.addEventListener('open', () => {
+            console.log('Connected to Streamer.bot WebSocket server');
+            res();
+          }, { signal });
+
+          this.socket.onopen = this.onOpen.bind(this);
+          this.socket.onclose = this.onClose.bind(this);
+          this.socket.onerror = this.onError.bind(this);
+          this.socket.onmessage = this.onMessage.bind(this);
+        } catch (error) {
+          await this.disconnect();
+
+          try {
+            this?.options?.onError?.(error as Error);
+          } catch (e) {
+            console.error('Error invoking onError handler', e);
+          }
+
+          rej(error);
+        }
+      }),
+    ]).finally(() => {
+      clearTimeout(timer);
+      controller.abort();
+    });
   }
 
   /**
    * Disconnect Streamer.bot WebSocket
    */
-  public disconnect(code: number = 1000): void {
+  public async disconnect(code: number = 1000, timeout: number = 10_000): Promise<void> {
     if (!this.socket || this.socket.readyState === this.socket.CLOSED) {
       return;
     }
 
-    this.socket.close(code);
+    const controller = new AbortController();
+    const signal = controller.signal;
+    let timer: NodeJS.Timeout;
+
     this.explicitlyClosed = true;
 
-    try {
-      this?.options?.onDisconnect?.();
-    } catch (e) {
-      console.error('Error invoking onDisconnect handler', e);
-    }
+    return await Promise.race([
+      new Promise<void>(
+        (res, rej) =>
+          (timer = setTimeout(() => {
+            controller.abort();
+            return rej({
+              message: 'Timeout exceeded while closing WebSocket connection',
+            });
+          }, timeout))
+      ),
+      new Promise<void>((res, rej) => {
+        this.socket?.addEventListener('close', () => {
+          console.log('Disconnected from Streamer.bot WebSocket server');
+          res();
+        }, { signal });
+
+        if (this.socket.readyState !== 2 && this.socket.readyState !== 3)
+          this.socket.close(code);
+
+        try {
+          this?.options?.onDisconnect?.();
+        } catch (e) {
+          console.error('Error invoking onDisconnect handler', e);
+        }
+      })
+    ]).finally(() => {
+      clearTimeout(timer);
+      controller.abort();
+    });
   }
 
   protected async onOpen(): Promise<void> {
@@ -152,11 +205,6 @@ export class StreamerbotClient {
         }, 1000);
       else this.cleanup();
     } else {
-      console.log(
-        'Explicitly closed, cleaning up...',
-        this.explicitlyClosed,
-        this.options.autoReconnect
-      );
       this.cleanup();
     }
   }
@@ -337,6 +385,8 @@ export class StreamerbotClient {
         events,
         callback: listener,
       });
+
+      console.log('Subscribed to events', events);
     } catch (e) {
       console.error('Failed adding event listener', events);
     }
