@@ -15,7 +15,7 @@ export default defineAppConfig({
       github: 'streamerbot/client',
     },
     aside: {
-      level: 0,
+      level: 1,
       exclude: [],
     },
     header: {
