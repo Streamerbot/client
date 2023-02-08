@@ -2,6 +2,8 @@
 
 TypeScript client for interacting with the [Streamer.bot](https://streamer.bot) WebSocket API
 
+[![npm (scoped)](https://img.shields.io/npm/v/@streamerbot/client)](https://www.npmjs.com/package/@streamerbot/client) [![npm](https://img.shields.io/npm/dt/@streamerbot/client)](https://www.npmjs.com/package/@streamerbot/client) [![docs](https://img.shields.io/badge/-Documentation-blue)](https://streamerbot.github.io/client)
+
 [Full Documentation](https://streamerbot.github.io/client/)
 
 ## 🌈 Demo
