@@ -23,7 +23,7 @@ function formatTime(timeStamp: string) {
     <v-card-text class="pa-0">
       <v-list density="compact">
         <v-dialog v-for="viewer in store.activeViewers" max-width="50rem" transition="dialog-bottom-transition">
-          <template v-slot:activator="{ props }">
+          <template #activator="{ props }">
             <v-list-item :key="viewer.id" v-bind="props">
               <v-list-item-title>{{ viewer.display }}</v-list-item-title>
               <v-list-item-subtitle class="mt-n1"><small>{{ viewer.role }}</small></v-list-item-subtitle>
@@ -33,7 +33,7 @@ function formatTime(timeStamp: string) {
               </template>
             </v-list-item>
           </template>
-          <template v-slot:default="{ isActive }">
+          <template #default="{ isActive }">
             <v-card>
               <v-toolbar color="primary" :title="viewer.display"></v-toolbar>
               <v-card-text>
@@ -93,5 +93,5 @@ function formatTime(timeStamp: string) {
         </v-dialog>
       </v-list>
     </v-card-text>
-</v-card>
+  </v-card>
 </template>
