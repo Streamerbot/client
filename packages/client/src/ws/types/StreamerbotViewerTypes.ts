@@ -3,7 +3,7 @@ export type StreamerbotViewer = {
   display: string;
   exempt: boolean;
   groups: Array<string>;
-  id: string;
+  id: any;
   login: string;
   previousActive: string;
   role: string;
