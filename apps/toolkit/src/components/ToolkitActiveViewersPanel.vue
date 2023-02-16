@@ -70,7 +70,7 @@ function formatTime(timeStamp: string) {
                       <td>Previous Active</td>
                       <td>{{ formatTime(viewer.previousActive) }}</td>
                     </tr>
-                    <tr>
+                    <tr v-if="!isNaN(viewer.id)">
                       <td>Channel Points Used</td>
                       <td>{{ viewer.channelPointsUsed }}</td>
                     </tr>
