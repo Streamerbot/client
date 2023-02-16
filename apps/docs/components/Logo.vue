@@ -11,7 +11,7 @@
 <style scoped>
 .logo {
   display: flex;
-  align-items: ClientRequest;
+  align-items: center;
 }
 
 .logo > span {
