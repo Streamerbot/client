@@ -386,7 +386,7 @@ export class StreamerbotClient {
         }
       }
 
-      if (updateSubscriptions && this.socket?.readyState === this.socket?.OPEN) {
+      if (updateSubscriptions && this.socket?.readyState === 1) {
         await this.subscribe(this.subscriptions);
       }
 
