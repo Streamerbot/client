@@ -9,6 +9,10 @@ onMounted(() => store.fetchActiveViewers());
 function formatTime(timeStamp: string) {
   return new Date(timeStamp).toLocaleTimeString();
 }
+
+function isYouTubeViewer(viewerId: string | number) {
+  return typeof viewerId === 'number' && !isNaN(viewerId);
+}
 </script>
 
 <template>
@@ -28,7 +32,7 @@ function formatTime(timeStamp: string) {
               <v-list-item-title>{{ viewer.display }}</v-list-item-title>
               <v-list-item-subtitle class="mt-n1"><small>{{ viewer.role }}</small></v-list-item-subtitle>
 
-              <template v-if="isNaN(viewer.id)" #append>
+              <template v-if="isYouTubeViewer(viewer.id)" #append>
                 <v-icon>mdi-youtube</v-icon>
               </template>
             </v-list-item>
@@ -70,7 +74,7 @@ function formatTime(timeStamp: string) {
                       <td>Previous Active</td>
                       <td>{{ formatTime(viewer.previousActive) }}</td>
                     </tr>
-                    <tr v-if="!isNaN(viewer.id)">
+                    <tr v-if="!isYouTubeViewer(viewer.id)">
                       <td>Channel Points Used</td>
                       <td>{{ viewer.channelPointsUsed }}</td>
                     </tr>
