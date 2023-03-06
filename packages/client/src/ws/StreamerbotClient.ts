@@ -30,7 +30,9 @@ export type StreamerbotClientOptions = {
   immediate: boolean;
   autoReconnect: boolean;
   retries: number;
-  subscribe: StreamerbotEventsSubscription | '*';
+  subscribe:
+    | StreamerbotEventsSubscription
+    | '*';
   onConnect?: (data: StreamerbotInfo) => void;
   onDisconnect?: () => void;
   onError?: (error: Error) => void;
@@ -173,9 +175,16 @@ export class StreamerbotClient {
     this.retried = 0;
 
     try {
+      // Subscribe to initial subscriptions requested in client options
       if (this.options.subscribe) {
         await this.subscribe(this.options.subscribe);
       }
+
+      // Subscribe to any events from listeners added with .on
+      if (this.subscriptions) {
+        await this.subscribe(this.subscriptions);
+      }
+
       const infoResponse = await this.getInfo();
       this?.options?.onConnect?.(infoResponse.info);
     } catch (e) {
@@ -377,7 +386,7 @@ export class StreamerbotClient {
         }
       }
 
-      if (updateSubscriptions) {
+      if (updateSubscriptions && this.socket?.readyState === this.socket?.OPEN) {
         await this.subscribe(this.subscriptions);
       }
 
