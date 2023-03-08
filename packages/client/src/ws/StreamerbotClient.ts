@@ -176,12 +176,12 @@ export class StreamerbotClient {
 
     try {
       // Subscribe to initial subscriptions requested in client options
-      if (this.options.subscribe) {
+      if (this.options.subscribe === '*' || Object.keys(this.options.subscribe ?? {}).length) {
         await this.subscribe(this.options.subscribe);
       }
 
       // Subscribe to any events from listeners added with .on
-      if (this.subscriptions) {
+      if (Object.keys(this.subscriptions ?? {}).length) {
         await this.subscribe(this.subscriptions);
       }
 
