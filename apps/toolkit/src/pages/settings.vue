@@ -33,8 +33,6 @@ const store = useStreamerbotStore();
       <v-spacer />
     </v-toolbar>
 
-    {{ store.status }}
-
     <v-row>
       <v-col cols="12" lg="6" xl="4">
         <v-card>
