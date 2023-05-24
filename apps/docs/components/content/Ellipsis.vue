@@ -13,7 +13,7 @@
   top: 0;
   bottom: 0;
   z-index: -1;
-  width: 100vw;
+  width: 100%;
   height: 80%;
   background: #0c0c0d;
   background-image: radial-gradient(ellipse at 0% 0%, rgb(26, 214, 255, 0.01), rgb(26, 214, 255, 0.001) 60%),
