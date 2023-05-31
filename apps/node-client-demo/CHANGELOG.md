@@ -1,4 +1,4 @@
-# @streamerbot/vue
+# @streamerbot/node-client-demo
 
 ## 1.1.0
 
@@ -10,14 +10,3 @@
 
 - Updated dependencies
   - @streamerbot/client@1.1.0
-
-## 1.0.0
-
-### Major Changes
-
-- Initial Release
-
-### Patch Changes
-
-- Updated dependencies
-  - @streamerbot/client@1.0.0

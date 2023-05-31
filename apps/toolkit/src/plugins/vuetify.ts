@@ -1,14 +1,12 @@
 import '@mdi/font/css/materialdesignicons.css';
 import { createVuetify } from 'vuetify';
 import { VDataTable } from 'vuetify/labs/VDataTable';
-import { VVirtualScroll } from 'vuetify/labs/VVirtualScroll';
 import 'vuetify/styles';
 import '../assets/styles/main.scss';
 
 export default createVuetify({
   components: {
     VDataTable,
-    VVirtualScroll,
   },
   theme: {
     defaultTheme: 'dark',
