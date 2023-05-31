@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.0",
-    "prettier": "latest",
+    "prettier": "^2.8.8",
     "turbo": "^1.7.1"
   },
   "engines": {

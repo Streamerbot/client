@@ -35,9 +35,9 @@
     "prepublishOnly": "yarn build"
   },
   "devDependencies": {
+    "@streamerbot/client": "*",
     "tsup": "^6.5.0",
-    "typescript": "^4.9.4",
-    "@streamerbot/client": "*"
+    "typescript": "^4.9.4"
   },
   "dependencies": {
     "vue-demi": "*"
