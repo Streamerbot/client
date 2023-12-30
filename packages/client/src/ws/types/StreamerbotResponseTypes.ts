@@ -54,6 +54,17 @@ export type GetActiveViewersResponse = StreamerbotResponse<{
   count: number;
 }>;
 
+export type ExecuteCodeTriggerResponse = StreamerbotResponse<unknown>;
+
+export type GetCodeTriggersResponse = StreamerbotResponse<{
+  triggers: Array<{
+    name: string;
+    eventName: string;
+    category: string;
+  }>;
+  count: number;
+}>;
+
 export type StreamerbotResponseTypes =
   | StreamerbotResponse<unknown>
   | SubscribeResponse
@@ -66,4 +77,6 @@ export type StreamerbotResponseTypes =
   | TestCreditsResponse
   | ClearCreditsResponse
   | GetInfoResponse
-  | GetActiveViewersResponse;
+  | GetActiveViewersResponse
+  | ExecuteCodeTriggerResponse
+  | GetCodeTriggersResponse;

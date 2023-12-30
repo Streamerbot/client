@@ -31,12 +31,12 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: "16"
-          cache: yarn
+          node-version: "20"
+          cache: pnpm
       - name: Install dependencies
-        run: yarn workspace @streamerbot/client-docs install
+        run: pnpm --filter @streamerbot/client-docs install
       - name: Static HTML export with Nuxt
-        run: yarn workspace @streamerbot/client-docs generate
+        run: pnpm --filter @streamerbot/client-docs generate
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:

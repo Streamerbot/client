@@ -29,10 +29,10 @@
     "dist/*"
   ],
   "scripts": {
-    "dev": "yarn build --watch",
+    "dev": "pnpm build --watch",
     "build": "tsup",
     "lint": "tsc",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "pnpm build"
   },
   "devDependencies": {
     "@streamerbot/client": "*",

@@ -2,10 +2,6 @@
   "name": "@streamerbot/monorepo",
   "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
@@ -15,12 +11,11 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.0",
-    "prettier": "^2.8.8",
+    "prettier": "^3.1.1",
     "turbo": "^1.7.1"
   },
   "engines": {
     "node": ">=14.0.0"
   },
-  "dependencies": {},
-  "packageManager": "yarn@1.22.19"
+  "dependencies": {}
 }

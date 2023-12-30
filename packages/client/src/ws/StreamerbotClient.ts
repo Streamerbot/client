@@ -2,17 +2,19 @@ import WebSocket from 'isomorphic-ws';
 import { StreamerbotAction, StreamerbotInfo } from './types';
 import {
   StreamerbotEventName,
-  StreamerbotEvents,
   StreamerbotEventSource,
+  StreamerbotEvents,
   StreamerbotEventsSubscription,
   StreamerbotEventsTypeWriteable
 } from './types/StreamerbotEventTypes';
 import {
   ClearCreditsResponse,
   DoActionResponse,
+  ExecuteCodeTriggerResponse,
   GetActionsResponse,
   GetActiveViewersResponse,
   GetBroadcasterResponse,
+  GetCodeTriggersResponse,
   GetCreditsResponse,
   GetEventsResponse,
   GetInfoResponse,
@@ -62,9 +64,7 @@ export class StreamerbotClient {
   protected explicitlyClosed = false;
   protected retried = 0;
 
-  public constructor(
-    options: Partial<StreamerbotClientOptions> = DefaultStreamerbotClientOptions
-  ) {
+  public constructor(options: Partial<StreamerbotClientOptions> = DefaultStreamerbotClientOptions) {
     this.options = { ...DefaultStreamerbotClientOptions, ...options };
 
     if (true === this.options.immediate) {
@@ -99,10 +99,14 @@ export class StreamerbotClient {
             `ws://${this.options.host}:${this.options.port}${this.options.endpoint}`
           );
 
-          this.socket.addEventListener('open', () => {
-            console.log('Connected to Streamer.bot WebSocket server');
-            res();
-          }, { signal });
+          this.socket.addEventListener(
+            'open',
+            () => {
+              console.log('Connected to Streamer.bot WebSocket server');
+              res();
+            },
+            { signal }
+          );
 
           this.socket.onopen = this.onOpen.bind(this);
           this.socket.onclose = this.onClose.bind(this);
@@ -151,20 +155,23 @@ export class StreamerbotClient {
           }, timeout))
       ),
       new Promise<void>((res, rej) => {
-        this.socket?.addEventListener('close', () => {
-          console.log('Disconnected from Streamer.bot WebSocket server');
-          res();
-        }, { signal });
+        this.socket?.addEventListener(
+          'close',
+          () => {
+            console.log('Disconnected from Streamer.bot WebSocket server');
+            res();
+          },
+          { signal }
+        );
 
-        if (this.socket.readyState !== 2 && this.socket.readyState !== 3)
-          this.socket.close(code);
+        if (this.socket.readyState !== 2 && this.socket.readyState !== 3) this.socket.close(code);
 
         try {
           this?.options?.onDisconnect?.();
         } catch (e) {
           console.error('Error invoking onDisconnect handler', e);
         }
-      })
+      }),
     ]).finally(() => {
       clearTimeout(timer);
       controller.abort();
@@ -378,9 +385,7 @@ export class StreamerbotClient {
           updateSubscriptions = true;
           const set = new Set([
             ...(this.subscriptions[eventSource] ?? []),
-            ...(eventType === '*'
-              ? StreamerbotEvents[eventSource]
-              : [eventType]),
+            ...(eventType === '*' ? StreamerbotEvents[eventSource] : [eventType]),
           ]);
           this.subscriptions[eventSource] = [...set] as any[];
         }
@@ -404,12 +409,9 @@ export class StreamerbotClient {
   /**
    * Subscribe to events from your connected Streamer.bot instance
    */
-  public async subscribe(
-    events: StreamerbotEventsSubscription | '*'
-  ): Promise<SubscribeResponse> {
+  public async subscribe(events: StreamerbotEventsSubscription | '*'): Promise<SubscribeResponse> {
     // subscribe to all if = '*'
-    if (events === '*')
-      events = StreamerbotEvents as StreamerbotEventsTypeWriteable;
+    if (events === '*') events = StreamerbotEvents as StreamerbotEventsTypeWriteable;
 
     for (const key in events) {
       if (key === undefined) continue;
@@ -419,10 +421,7 @@ export class StreamerbotClient {
       const eventTypes = events[eventSource] ?? [];
 
       if (eventTypes && eventTypes.length) {
-        const set = new Set([
-          ...(this.subscriptions[eventSource] ?? []),
-          ...eventTypes,
-        ]);
+        const set = new Set([...(this.subscriptions[eventSource] ?? []), ...eventTypes]);
         this.subscriptions[eventSource] = [...set] as any[];
       }
     }
@@ -440,8 +439,7 @@ export class StreamerbotClient {
     events: StreamerbotEventsSubscription | '*'
   ): Promise<UnsubscribeResponse> {
     // unsubscribe from all if = '*'
-    if (events === '*')
-      events = StreamerbotEvents as StreamerbotEventsTypeWriteable;
+    if (events === '*') events = StreamerbotEvents as StreamerbotEventsTypeWriteable;
 
     // remove subscriptions from state
     for (const key in events) {
@@ -455,9 +453,9 @@ export class StreamerbotClient {
         for (const eventType of eventTypes) {
           if (eventType) {
             if (this.subscriptions[eventSource]?.filter) {
-              (this.subscriptions[eventSource] = this.subscriptions[
-                eventSource
-              ] as any[])?.filter((evt: any) => eventType !== evt);
+              (this.subscriptions[eventSource] = this.subscriptions[eventSource] as any[])?.filter(
+                (evt: any) => eventType !== evt
+              );
             }
           }
         }
@@ -566,6 +564,29 @@ export class StreamerbotClient {
   public async getActiveViewers(): Promise<GetActiveViewersResponse> {
     return await this.request<GetActiveViewersResponse>({
       request: 'GetActiveViewers',
+    });
+  }
+
+  /**
+   * Execute a code trigger
+   */
+  public async executeCodeTrigger(
+    triggerName: string,
+    args?: Record<string, any>
+  ): Promise<ExecuteCodeTriggerResponse> {
+    return await this.request<ExecuteCodeTriggerResponse>({
+      request: 'ExecuteCodeTrigger',
+      triggerName,
+      args,
+    });
+  }
+
+  /**
+   * Get all code triggers
+   */
+  public async getCodeTriggers(): Promise<GetCodeTriggersResponse> {
+    return await this.request<GetCodeTriggersResponse>({
+      request: 'GetCodeTriggers',
     });
   }
 }

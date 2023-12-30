@@ -1,34 +1,13 @@
 export default defineAppConfig({
-  docus: {
-    title: 'Streamer.bot Client Documentation',
-    description:
-      'Typescript client for interacting with the Streamer.bot WebSocket API',
-    url: 'https://streamerbot.github.io/client',
-    image: 'https://streamerbot.github.io/client/og-image.png',
-    socials: {
-      web: {
-        label: 'Streamer.bot',
-        icon: 'mdi:launch',
-        href: 'https://streamer.bot',
-      },
-      twitter: 'streamerdotbot',
-      github: 'streamerbot/client',
-    },
-    aside: {
-      level: 1,
-      exclude: [],
-    },
-    header: {
-      logo: true,
-      showLinkIcon: true,
-      exclude: [],
-    },
-    github: {
-      dir: 'apps/docs/content',
-      branch: 'main',
-      repo: 'client',
-      owner: 'Streamerbot',
-      edit: true,
-    },
+  // FIXME: This is a workaround for nuxt-icon typecheck errors: https://github.com/nuxt-modules/icon/issues/86
+  nuxtIcon: {
+    aliases: undefined,
+    class: undefined,
+    size: undefined,
+  },
+
+  ui: {
+    primary: 'blue',
+    gray: 'neutral',
   },
 });

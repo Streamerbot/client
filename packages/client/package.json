@@ -32,11 +32,11 @@
     "dist/*"
   ],
   "scripts": {
-    "dev": "yarn build --watch",
+    "dev": "pnpm build --watch",
     "build": "tsup",
     "build:browser": "tsup --config tsup.browser.config.ts",
     "lint": "tsc",
-    "prepublishOnly": "yarn build && yarn build:browser"
+    "prepublishOnly": "pnpm build && pnpm build:browser"
   },
   "devDependencies": {
     "tsup": "^6.5.0",
