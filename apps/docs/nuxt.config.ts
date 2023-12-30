@@ -11,7 +11,7 @@ export default defineNuxtConfig({
   ],
 
   app: {
-    baseURL: '/client/',
+    baseURL: '/client',
     head: {
       link: [{ rel: 'icon', type: 'image/png', href: '/client/favicon.ico' }],
     },
@@ -22,7 +22,7 @@ export default defineNuxtConfig({
   },
 
   site: {
-    url: 'https://streamerbot.github.io/client/',
+    url: 'https://streamerbot.github.io/client',
     name: 'Streamer.bot WebSocket Client',
     twitterCard: 'summary_large_image',
   },

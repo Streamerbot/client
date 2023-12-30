@@ -35,6 +35,8 @@ export function useSeo(page: Ref<ParsedContent>, options: OgImageOptions = defau
     ? navKeyFromPath(`/${parentPath}`, 'icon', navigation.value)
     : undefined;
 
+  console.log(route);
+
   if (page.value?.ogImage !== false) {
     defineOgImage({
       component: options.component ?? defaultOptions.component,
@@ -52,7 +54,7 @@ export function useSeo(page: Ref<ParsedContent>, options: OgImageOptions = defau
   useSeoMeta({
     titleTemplate: '%s | Streamer.bot WebSocket Client',
     title: page.value?.title ?? '',
-    ogUrl: `https://streamerbot.github.io${page.value?._path ?? ''}`,
+    ogUrl: `https://streamerbot.github.io/client${page.value?._path ?? ''}`,
     ogTitle: `${page.value?.title}`,
     ogDescription: page.value?.description,
   });
