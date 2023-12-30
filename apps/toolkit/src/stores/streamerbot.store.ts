@@ -56,6 +56,7 @@ export const useStreamerbotStore = defineStore('streamerbot', () => {
         type: string;
       };
       data: any;
+      raw: any;
     }>
   >('sb:toolkit:logs:v2', []);
 

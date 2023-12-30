@@ -130,7 +130,7 @@ importers:
         specifier: ^4.1.6
         version: 4.2.5(vue@3.4.0)
       vuetify:
-        specifier: ^3.0.6
+        specifier: ^3.4.9
         version: 3.4.9(typescript@4.9.5)(vite-plugin-vuetify@1.0.2)(vue@3.4.0)
       webfontloader:
         specifier: ^1.6.28

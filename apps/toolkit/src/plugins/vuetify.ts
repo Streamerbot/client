@@ -1,13 +1,9 @@
 import '@mdi/font/css/materialdesignicons.css';
 import { createVuetify } from 'vuetify';
-import { VDataTable } from 'vuetify/labs/VDataTable';
 import 'vuetify/styles';
 import '../assets/styles/main.scss';
 
 export default createVuetify({
-  components: {
-    VDataTable,
-  },
   theme: {
     defaultTheme: 'dark',
     themes: {

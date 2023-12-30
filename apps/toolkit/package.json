@@ -19,7 +19,7 @@
     "uuid": "^9.0.0",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6",
-    "vuetify": "^3.0.6",
+    "vuetify": "^3.4.9",
     "webfontloader": "^1.6.28",
     "zod": "^3.20.2"
   },
