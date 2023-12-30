@@ -4,7 +4,6 @@ export default defineNuxtConfig({
   modules: [
     '@nuxt/ui',
     '@vueuse/nuxt',
-    '@nuxtjs/plausible',
     'nuxt-og-image',
     'nuxt-link-checker',
     'nuxt-icon',

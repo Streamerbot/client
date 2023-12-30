@@ -25,7 +25,6 @@
     "@iconify-json/skill-icons": "^1.1.5",
     "@nuxt/devtools": "^1.0.5",
     "@nuxtjs/fontaine": "^0.4.1",
-    "@nuxtjs/plausible": "^0.2.4",
     "@streamerbot/client": "workspace:*",
     "@vueuse/nuxt": "^10.7.0",
     "nuxt": "^3.8.2",

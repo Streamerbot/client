@@ -28,15 +28,31 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: "20"
           cache: pnpm
+
+      - name: Create .env
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          envkey_NUXT_PUBLIC_SITE_URL: https://streamerbot.github.io
+          envkey_NUXT_HOST: 0.0.0.0
+          envkey_NUXT_UI_PRO_LICENSE: ${{ secrets.NUXT_UI_PRO_LICENSE }}
+
       - name: Install dependencies
         run: pnpm --filter @streamerbot/client-docs install
-      - name: Static HTML export with Nuxt
+
+      - name: Build
         run: pnpm --filter @streamerbot/client-docs generate
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
