@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <div class="ellipsis"></div>
+  <div class="ellipsis" />
 </template>
 
 <style scoped>

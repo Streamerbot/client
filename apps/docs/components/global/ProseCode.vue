@@ -30,10 +30,13 @@ const name = computed(() => isImportCode ? 'Import Code' : props.filename);
 </script>
 
 <template>
-  <div class="relative" :class="{
-    [ui.wrapper]: !!name,
-    [ui.importWrapper]: isImportCode
-  }">
+  <div
+    class="relative"
+    :class="{
+      [ui.wrapper]: !!name,
+      [ui.importWrapper]: isImportCode
+    }"
+  >
     <div v-if="name && !hideHeader" :class="ui.header">
       <IconStreamerbot v-if="isImportCode" :class="ui.icon.base" height="16" width="16" />
       <ProseCodeIcon v-else :icon="icon" :filename="name" :class="ui.icon.base" />

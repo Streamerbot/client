@@ -35,8 +35,8 @@ const props = withDefaults(defineProps<{
   target: undefined,
   ui: () => ({}),
   class: undefined,
-  title: `Documentation in Progress`,
-  description: `Wiki migration currently in progress`
+  title: 'Documentation in Progress',
+  description: 'Wiki migration currently in progress'
 })
 
 const { ui, attrs } = useUI('content.callout', toRef(props, 'ui'), config, toRef(props, 'class'), true)
@@ -67,9 +67,11 @@ const colorDark = computed(() => {
 
     <strong class="mr-2 text-[--color-light] dark:text-[--color-dark]">
       {{ title }}
-    </strong><br/>
+    </strong><br>
     <div class="pl-6">
-      <ContentSlot :use="$slots.default" unwrap="p">{{ description }}</ContentSlot>
+      <ContentSlot :use="$slots.default" unwrap="p">
+        {{ description }}
+      </ContentSlot>
     </div>
   </div>
 </template>

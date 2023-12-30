@@ -61,9 +61,7 @@ const links = [
       </div>
     </template>
 
-    <template #center>
-
-    </template>
+    <template #center />
 
     <template #right>
       <UButton

@@ -24,6 +24,7 @@
     "@iconify-json/carbon": "^1.1.24",
     "@iconify-json/skill-icons": "^1.1.5",
     "@nuxt/devtools": "^1.0.5",
+    "@nuxt/eslint-config": "^0.2.0",
     "@nuxtjs/fontaine": "^0.4.1",
     "@streamerbot/client": "workspace:*",
     "@vueuse/nuxt": "^10.7.0",
