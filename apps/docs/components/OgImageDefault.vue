@@ -5,7 +5,6 @@ defineOptions({
 });
 
 type Props = {
-  path: string;
   title?: string;
   description?: string;
   icon?: string;

@@ -126,11 +126,4 @@ export default defineNuxtConfig({
       markdown: true,
     },
   },
-
-  // Dev overrides
-  $development: {
-    site: {
-      url: 'localhost',
-    },
-  },
 });

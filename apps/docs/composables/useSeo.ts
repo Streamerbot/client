@@ -15,41 +15,10 @@ const defaultOptions: OgImageOptions = {
 export function useSeo(page: Ref<ParsedContent>, options: OgImageOptions = defaultOptions) {
   if (!page?.value) return;
 
-  const route = useRoute();
-  const navigation = inject<ComputedRef<NavItem[]>>('fullNavigation');
-  const { navKeyFromPath } = useContentHelpers();
-
-  // Grab any manually set category
-  const category = navKeyFromPath(
-    route.path.slice(0, route.path.lastIndexOf('/')),
-    'category',
-    navigation.value
-  );
-
-  // Grab root parent title/icon as fallbacks
-  const parentPath = route.path?.split('/').at(1) ?? '';
-  const parentTitle = parentPath
-    ? navKeyFromPath(`/${parentPath}`, 'title', navigation.value)
-    : undefined;
-  const parentIcon = parentPath
-    ? navKeyFromPath(`/${parentPath}`, 'icon', navigation.value)
-    : undefined;
-
-  console.log(route);
-
-  if (page.value?.ogImage !== false) {
-    defineOgImage({
-      component: options.component ?? defaultOptions.component,
-      title: page.value?.title ?? 'Docs',
-      description: page.value?.description,
-      icon: page.value?.icon ?? category?.icon ?? false,
-      siteName: 'Streamer.bot WebSocket Client',
-      categoryTitle: category?.title ?? parentTitle,
-      categoryIcon: category?.icon ?? parentIcon,
-      cacheKey: btoa(`${route.path}:${page.value?.title ?? 'Docs'}:${category?.title ?? parentTitle}`),
-      cacheTtl: 60 * 60 * 24 * 30, // 30 days
-    });
-  }
+  defineOgImage({
+    path: page.value?._path,
+    url: 'https://streamerbot.github.io/client/og-image.png',
+  });
 
   useSeoMeta({
     titleTemplate: '%s | Streamer.bot WebSocket Client',
