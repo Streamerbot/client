@@ -1,5 +1,11 @@
 # @streamerbot/client
 
+## 1.3.0
+
+### Minor Changes
+
+- 76a55f7: add scheme option to support wss://
+
 ## 1.2.1
 
 ### Patch Changes

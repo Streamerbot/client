@@ -1,5 +1,16 @@
 # @streamerbot/vue
 
+## 2.0.0
+
+### Minor Changes
+
+- 76a55f7: add scheme option to support wss://
+
+### Patch Changes
+
+- Updated dependencies [76a55f7]
+  - @streamerbot/client@1.3.0
+
 ## 1.2.1
 
 ### Patch Changes
