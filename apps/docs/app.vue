@@ -4,13 +4,13 @@ import { debounce } from 'perfect-debounce';
 import { gt } from 'semver';
 import { withoutTrailingSlash } from 'ufo';
 
-const searchRef = ref()
+const searchRef = ref();
 
-const route = useRoute()
-const colorMode = useColorMode()
+const route = useRoute();
+const colorMode = useColorMode();
 
-const { data: nav } = await useAsyncData('navigation', () => fetchContentNavigation())
-const { data: files } = useLazyFetch<ParsedContent[]>('/api/search.json', { default: () => [], server: false })
+const { data: nav } = await useAsyncData('navigation', () => fetchContentNavigation());
+const { data: files } = useLazyFetch<ParsedContent[]>('/api/search.json', { default: () => [], server: false });
 
 // Computed
 const navigation = computed(() => {

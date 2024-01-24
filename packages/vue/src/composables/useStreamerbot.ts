@@ -4,7 +4,7 @@ import {
   StreamerbotInfo,
   WebSocketStatus
 } from '@streamerbot/client';
-import { ref, Ref, unref } from 'vue-demi';
+import { Ref, ref, unref } from 'vue-demi';
 
 export type MaybeRefs<T> = { [P in keyof T]: Ref<T[P]> | T[P] };
 export type UseStreamerbotOptions = MaybeRefs<StreamerbotClientOptions>;

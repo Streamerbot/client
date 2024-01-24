@@ -1,5 +1,13 @@
 # @streamerbot/vue
 
+## 1.2.1
+
+### Patch Changes
+
+- Add bufferutil to deps
+- Updated dependencies
+  - @streamerbot/client@1.2.1
+
 ## 2.0.0
 
 ### Minor Changes

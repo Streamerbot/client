@@ -113,7 +113,7 @@ export default defineNuxtConfig({
   ogImage: {
     runtimeCacheStorage: true,
     defaults: {
-      cacheTtl: 60 * 60 * 24 * 30, // 30 daysc
+      cacheMaxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
     },
   },
 

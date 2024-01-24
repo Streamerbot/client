@@ -1,6 +1,6 @@
 import { StreamerbotClient } from '@streamerbot/client';
 
-const client = new StreamerbotClient({ host: 'aphex', immediate: false });
+const client = new StreamerbotClient({ host: 'aphex.local', port: 9001, immediate: false });
 await client.connect();
 
 const info = await client.getInfo();

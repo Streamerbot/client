@@ -26,6 +26,7 @@ import {
 import { generateRequestId, getCloseEventReason } from './util/ws-utils';
 
 export type StreamerbotClientOptions = {
+  scheme: 'ws' | 'wss' | string;
   host: string;
   port: number;
   endpoint: string;
@@ -42,6 +43,7 @@ export type StreamerbotClientOptions = {
 };
 
 export const DefaultStreamerbotClientOptions: StreamerbotClientOptions = {
+  scheme: 'ws',
   host: '127.0.0.1',
   port: 8080,
   endpoint: '/',
@@ -96,7 +98,7 @@ export class StreamerbotClient {
       new Promise<void>(async (res, rej) => {
         try {
           this.socket = new WebSocket(
-            `ws://${this.options.host}:${this.options.port}${this.options.endpoint}`
+	    `${this.options.scheme}://${this.options.host}:${this.options.port}${this.options.endpoint}`
           );
 
           this.socket.addEventListener(
