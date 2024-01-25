@@ -1,5 +1,11 @@
 # @streamerbot/client
 
+## 1.3.1
+
+### Patch Changes
+
+- 77c305a: add scheme option to vue package
+
 ## 1.3.0
 
 ### Minor Changes
