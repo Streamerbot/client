@@ -68,6 +68,7 @@ export function useStreamerbot(options: Partial<UseStreamerbotOptions> = {}): Us
       status.value = 'CONNECTING';
 
     const client = new StreamerbotClient({
+      scheme: unref(options.scheme) ?? 'ws',
       host: unref(options.host) ?? '127.0.0.1',
       port: unref(options.port) ?? 8080,
       endpoint: unref(options.endpoint) ?? '/',
