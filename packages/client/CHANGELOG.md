@@ -1,5 +1,11 @@
 # @streamerbot/client
 
+## 1.4.0
+
+### Minor Changes
+
+- add payload types, general bug fixes
+
 ## 1.3.1
 
 ### Patch Changes

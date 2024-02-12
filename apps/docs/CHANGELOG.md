@@ -1,5 +1,16 @@
 # @streamerbot/client-docs
 
+## 1.3.0
+
+### Minor Changes
+
+- add payload types, general bug fixes
+
+### Patch Changes
+
+- Updated dependencies
+  - @streamerbot/vue@2.0.0
+
 ## 1.2.0
 
 ### Minor Changes
