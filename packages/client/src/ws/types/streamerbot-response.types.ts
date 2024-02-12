@@ -1,15 +1,15 @@
-import { StreamerbotAction } from './StreamerbotActionTypes';
+import { StreamerbotAction } from './streamerbot-action.types';
 import {
   BroadcasterPlatform,
   BroadcasterPlatforms
-} from './StreamerbotBroadcasterTypes';
-import { StreamerbotCredits } from './StreamerbotCreditsTypes';
+} from './streamerbot-broadcaster.types';
+import { StreamerbotCredits } from './streamerbot-credits.types';
 import {
   StreamerbotEventsSubscription,
   StreamerbotEventsType
-} from './StreamerbotEventTypes';
-import { StreamerbotInfo } from './StreamerbotInfoTypes';
-import { StreamerbotViewer } from './StreamerbotViewerTypes';
+} from './streamerbot-event.types';
+import { StreamerbotInfo } from './streamerbot-info.types';
+import { StreamerbotViewer } from './streamerbot-viewer.types.ts';
 
 export type StreamerbotResponse<T> = T & {
   id: string;

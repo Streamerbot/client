@@ -6,11 +6,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "node index.js"
   },
   "devDependencies": {},
   "dependencies": {
-    "@streamerbot/client": "*",
-    "nodemon": "^2.0.20"
+    "@streamerbot/client": "workspace:*"
   }
 }

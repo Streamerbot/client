@@ -1,7 +1,7 @@
-import crypto from 'isomorphic-webcrypto';
+import { getRandomValues } from 'uncrypto';
 
 export function generateRequestId() {
-  return `sb:client:req:${Date.now()}-${crypto.getRandomValues(new Uint32Array(12))[0]}`;
+  return `sb:client:req:${Date.now()}-${getRandomValues(new Uint32Array(12))[0]}`;
 }
 
 export function getCloseEventReason(event: CloseEvent) {

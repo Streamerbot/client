@@ -50,24 +50,24 @@ export function useStreamerbot(options: Partial<UseStreamerbotOptions> = {}): Us
     if (cb) cb(payload);
   }
 
-  function connect() {
-    disconnect();
+  async function connect() {
+    await disconnect();
     _init(true);
   }
 
-  function disconnect() {
+  async function disconnect() {
     if (!clientRef.value) return;
-    clientRef.value.disconnect();
+    await clientRef.value.disconnect();
     clientRef.value = undefined;
   }
 
+  let _client: StreamerbotClient | undefined;
   function _init(immediate: boolean = false) {
     console.log('Initializing Streamer.bot Client...');
 
-    if (options.immediate)
-      status.value = 'CONNECTING';
+    if (immediate) status.value = 'CONNECTING';
 
-    const client = new StreamerbotClient({
+    _client = new StreamerbotClient({
       scheme: unref(options.scheme) ?? 'ws',
       host: unref(options.host) ?? '127.0.0.1',
       port: unref(options.port) ?? 8080,
@@ -81,7 +81,7 @@ export function useStreamerbot(options: Partial<UseStreamerbotOptions> = {}): Us
       onError,
       onData
     });
-    clientRef.value = client;
+    clientRef.value = _client;
   }
 
   if (unref(options.immediate))

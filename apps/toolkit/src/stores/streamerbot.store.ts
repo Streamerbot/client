@@ -72,7 +72,7 @@ export const useStreamerbotStore = defineStore('streamerbot', () => {
     isNewConnection.value = false;
 
     // attach listeners to update actions on change
-    client.value?.on(['Application.*'], async () => {
+    client.value?.on('Application.*', async () => {
       actions.value = (await client.value?.getActions())?.actions ?? [];
     });
   }
