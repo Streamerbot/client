@@ -1,5 +1,11 @@
 # @streamerbot/vue
 
+## 1.4.1
+
+### Patch Changes
+
+- fix exports
+
 ## 2.0.0
 
 ### Minor Changes
