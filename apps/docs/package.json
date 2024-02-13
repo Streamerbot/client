@@ -10,29 +10,29 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@nuxt/content": "^2.9.0",
-    "@nuxt/ui-pro": "^0.6.1",
-    "@streamerbot/vue": "^1.4.1",
-    "nuxt-component-meta": "^0.5.4",
-    "nuxt-icon": "^0.6.7"
+    "@nuxt/content": "^2.12.0",
+    "@nuxt/ui-pro": "^0.7.5",
+    "@streamerbot/vue": "^1.4.3",
+    "nuxt-component-meta": "^0.6.3",
+    "nuxt-icon": "^0.6.8"
   },
   "devDependencies": {
-    "@iconify-json/carbon": "^1.1.24",
-    "@iconify-json/heroicons": "^1.1.15",
-    "@iconify-json/logos": "^1.1.40",
-    "@iconify-json/mdi": "^1.1.60",
-    "@iconify-json/simple-icons": "^1.1.82",
-    "@iconify-json/skill-icons": "^1.1.5",
-    "@iconify-json/vscode-icons": "^1.1.31",
-    "@nuxt/devtools": "^1.0.5",
+    "@iconify-json/carbon": "^1.1.30",
+    "@iconify-json/heroicons": "^1.1.19",
+    "@iconify-json/logos": "^1.1.42",
+    "@iconify-json/mdi": "^1.1.64",
+    "@iconify-json/simple-icons": "^1.1.91",
+    "@iconify-json/skill-icons": "^1.1.7",
+    "@iconify-json/vscode-icons": "^1.1.33",
+    "@nuxt/devtools": "^1.0.8",
     "@nuxt/eslint-config": "^0.2.0",
     "@nuxtjs/fontaine": "^0.4.1",
     "@streamerbot/client": "^1.4.0",
-    "@vueuse/nuxt": "^10.7.0",
-    "nuxt": "^3.9.0",
-    "nuxt-headlessui": "^1.1.4",
-    "nuxt-link-checker": "^2.1.10",
-    "nuxt-og-image": "^3.0.0-rc.13",
-    "semver": "^7.5.4"
+    "@vueuse/nuxt": "^10.7.2",
+    "nuxt": "^3.10.1",
+    "nuxt-headlessui": "^1.1.5",
+    "nuxt-link-checker": "^2.1.11",
+    "nuxt-og-image": "3.0.0-rc.38",
+    "semver": "^7.6.0"
   }
 }

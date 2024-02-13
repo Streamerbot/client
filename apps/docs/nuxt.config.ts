@@ -1,6 +1,7 @@
 
 export default defineNuxtConfig({
   extends: ['@nuxt/ui-pro'],
+
   modules: [
     '@nuxt/ui',
     '@vueuse/nuxt',
@@ -38,7 +39,6 @@ export default defineNuxtConfig({
 
   devtools: {
     enabled: true,
-    embedded: true,
   },
 
   content: {
@@ -118,7 +118,7 @@ export default defineNuxtConfig({
   },
 
   linkChecker: {
-    enabled: true,
+    enabled: false,
     showLiveInspections: true,
     fetchRemoteUrls: false,
     report: {

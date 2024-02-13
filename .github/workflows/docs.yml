@@ -37,7 +37,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: "20"
+          node-version: 20
           cache: pnpm
 
       - name: Create .env
@@ -49,7 +49,10 @@ jobs:
           envkey_NUXT_UI_PRO_LICENSE: ${{ secrets.NUXT_UI_PRO_LICENSE }}
 
       - name: Install dependencies
-        run: pnpm --filter @streamerbot/client-docs install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build @streamerbot/vue
+        run: pnpm --filter @streamerbot/vue build
 
       - name: Build
         run: pnpm --filter @streamerbot/client-docs generate

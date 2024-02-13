@@ -1,6 +1,6 @@
 {
   "name": "@streamerbot/vue",
-  "version": "1.4.1",
+  "version": "1.4.3",
   "description": "Streamer.bot Vue Composition Utilities",
   "author": "Whipstickgostop <https://github.com/whiptsickgostop>",
   "license": "MIT",
@@ -15,27 +15,26 @@
     "vue"
   ],
   "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
       "require": "./dist/index.cjs"
     }
   },
+  "main": "./dist/index.cjs",
+  "types": "./dist/index.d.ts",
   "files": [
-    "dist/*"
+    "dist"
   ],
   "scripts": {
     "dev": "pnpm build --watch",
-    "build": "tsup",
+    "build": "unbuild",
     "lint": "tsc",
     "prepublishOnly": "pnpm build"
   },
   "devDependencies": {
     "@streamerbot/client": "*",
-    "tsup": "^8.0.2",
+    "unbuild": "^2.0.0",
     "typescript": "^5.3.0"
   },
   "dependencies": {
