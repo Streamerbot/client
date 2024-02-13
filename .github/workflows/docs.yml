@@ -25,6 +25,10 @@ jobs:
   # Build job
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -37,8 +41,11 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: ${{ matrix.node-version }}
           cache: pnpm
+
+      - name: Setup node-gyp
+        run: pnpm install -g node-gyp node-gyp-build
 
       - name: Create .env
         uses: SpicyPizza/create-envfile@v2.0
@@ -50,6 +57,9 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Build @streamerbot/client
+        run: pnpm --filter @streamerbot/client build
 
       - name: Build @streamerbot/vue
         run: pnpm --filter @streamerbot/vue build
