@@ -1,5 +1,11 @@
 # @streamerbot/client
 
+## 1.5.0
+
+### Minor Changes
+
+- fix retry backoff
+
 ## 1.4.0
 
 ### Minor Changes

@@ -1,5 +1,11 @@
 # @streamerbot/client-docs
 
+## 1.4.1
+
+### Patch Changes
+
+- @streamerbot/vue@2.0.0
+
 ## 1.3.0
 
 ### Minor Changes

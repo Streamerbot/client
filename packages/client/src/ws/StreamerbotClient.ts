@@ -228,12 +228,11 @@ export class StreamerbotClient {
         typeof this.options.retries === 'number' &&
         (this.options.retries < 0 || this.retried < this.options.retries)
       ) {
-        if (!this._reconnectTimeout) {
-          this._reconnectTimeout = setTimeout(() => {
-            console.log(`Reconnecting... (attempt ${this.retried})`);
-            this.connect();
-          }, Math.max(10000, this.retried * 1000));
-        }
+        if (!this._reconnectTimeout) clearTimeout(this._reconnectTimeout);
+        this._reconnectTimeout = setTimeout(() => {
+          console.log(`Reconnecting... (attempt ${this.retried})`);
+          this.connect();
+        }, Math.max(10000, this.retried * 1000));
       }
       else this.cleanup();
     } else {
