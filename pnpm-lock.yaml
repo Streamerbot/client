@@ -30,7 +30,7 @@ importers:
         specifier: ^0.7.5
         version: 0.7.5(nuxt@3.10.1)(vite@5.1.1)(vue@3.4.19)
       '@streamerbot/vue':
-        specifier: ^1.4.3
+        specifier: ^1.5.0
         version: link:../../packages/vue
       nuxt-component-meta:
         specifier: ^0.6.3
@@ -70,7 +70,7 @@ importers:
         specifier: ^0.4.1
         version: 0.4.1
       '@streamerbot/client':
-        specifier: ^1.4.0
+        specifier: ^1.5.0
         version: link:../../packages/client
       '@vueuse/nuxt':
         specifier: ^10.7.2
