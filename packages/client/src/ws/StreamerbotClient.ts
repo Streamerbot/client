@@ -231,7 +231,7 @@ export class StreamerbotClient {
         if (!this._reconnectTimeout) clearTimeout(this._reconnectTimeout);
         this._reconnectTimeout = setTimeout(() => {
           console.log(`Reconnecting... (attempt ${this.retried})`);
-          this.connect();
+          this.connect().catch(console.error);
         }, Math.max(10000, this.retried * 1000));
       }
       else this.cleanup();
