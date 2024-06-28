@@ -10,12 +10,13 @@
     "publish-packages": "turbo run build lint && changeset version && changeset publish"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.1",
-    "eslint": "^8.56.0",
-    "prettier": "^3.2.5",
-    "turbo": "^1.12.3"
+    "@changesets/cli": "^2.27.6",
+    "eslint": "^8.57.0",
+    "prettier": "^3.3.2",
+    "turbo": "^1.13.4"
   },
   "engines": {
     "node": ">=14.0.0"
-  }
+  },
+  "packageManager": "pnpm@8.14.1+sha1.d039b38e0b20ad012ed548e44267b8d4c88b447a"
 }

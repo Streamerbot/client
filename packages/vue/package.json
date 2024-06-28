@@ -33,12 +33,12 @@
     "prepublishOnly": "pnpm build"
   },
   "devDependencies": {
-    "@streamerbot/client": "*",
-    "unbuild": "^2.0.0",
-    "typescript": "^5.3.0"
+    "@streamerbot/client": "workspace:^",
+    "typescript": "^5.5.2",
+    "unbuild": "^2.0.0"
   },
   "dependencies": {
-    "vue-demi": "*"
+    "vue-demi": "^0.14.8"
   },
   "peerDependencies": {
     "@streamerbot/client": "^1.5.0"

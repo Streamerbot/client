@@ -1,5 +1,12 @@
 # @streamerbot/node-client-demo
 
+## 1.4.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @streamerbot/client@1.5.1
+
 ## 1.4.1
 
 ### Patch Changes
