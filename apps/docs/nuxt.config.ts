@@ -1,4 +1,3 @@
-
 export default defineNuxtConfig({
   extends: ['@nuxt/ui-pro'],
 
@@ -7,7 +6,6 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     'nuxt-og-image',
     'nuxt-link-checker',
-    'nuxt-icon',
     '@nuxt/content',
   ],
 
@@ -94,22 +92,6 @@ export default defineNuxtConfig({
     },
   },
 
-  hooks: {
-    // Related to https://github.com/nuxt/nuxt/pull/22558
-    // Adding all global components to the main entry
-    // To avoid lagging during page navigation on client-side
-    // Downside: bigger JS bundle
-    // With sync: 465KB, gzip: 204KB
-    // Without: 418KB, gzip: 184KB
-    'components:extend'(components) {
-      for (const comp of components) {
-        if (comp.global) {
-          comp.global = 'sync';
-        }
-      }
-    },
-  },
-
   ogImage: {
     runtimeCacheStorage: true,
     defaults: {
@@ -126,4 +108,10 @@ export default defineNuxtConfig({
       markdown: true,
     },
   },
+
+  future: {
+    compatibilityVersion: 4,
+  },
+
+  compatibilityDate: '2024-09-25',
 });
