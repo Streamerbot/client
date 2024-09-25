@@ -39,9 +39,6 @@ jobs:
           node-version: 20
           cache: pnpm
 
-      - name: Setup node-gyp
-        run: pnpm install -g node-gyp node-gyp-build
-
       - name: Create .env
         uses: SpicyPizza/create-envfile@v2.0
         with:
