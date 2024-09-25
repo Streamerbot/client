@@ -1,13 +1,7 @@
 export default defineNuxtConfig({
   extends: ['@nuxt/ui-pro'],
 
-  modules: [
-    '@nuxt/ui',
-    '@vueuse/nuxt',
-    'nuxt-og-image',
-    'nuxt-link-checker',
-    '@nuxt/content',
-  ],
+  modules: ['@nuxt/ui', '@vueuse/nuxt', 'nuxt-og-image', 'nuxt-link-checker', '@nuxt/content', '@nuxt/image'],
 
   app: {
     baseURL: '/client',
