@@ -10,6 +10,6 @@
   },
   "devDependencies": {},
   "dependencies": {
-    "@streamerbot/client": "workspace:*"
+    "@streamerbot/client": "^1.5.0"
   }
 }
