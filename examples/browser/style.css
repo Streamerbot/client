@@ -1,0 +1,17 @@
+body {
+  background-color: #222;
+  color: #fff;
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
+
+.message {
+  margin: 1em;
+  padding: 1em;
+  border-radius: .5em;
+  background-color: #333;
+}
+
+.username {
+  font-weight: bold;
+  margin-right: .5em;
+}
