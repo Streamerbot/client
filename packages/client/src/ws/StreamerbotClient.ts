@@ -425,7 +425,15 @@ export class StreamerbotClient {
    */
   public async subscribe(events: StreamerbotEventsSubscription | '*'): Promise<SubscribeResponse> {
     // subscribe to all if = '*'
-    if (events === '*') events = StreamerbotEvents as StreamerbotEventsTypeWriteable;
+    if (events === '*') {
+      try {
+        const response = await this.getEvents();
+        if (!response?.events) throw new Error('No events found');
+        events = response.events as StreamerbotEventsTypeWriteable;
+      } catch (e) {
+        events = StreamerbotEvents as StreamerbotEventsTypeWriteable;
+      }
+    }
 
     for (const key in events) {
       if (key === undefined) continue;
