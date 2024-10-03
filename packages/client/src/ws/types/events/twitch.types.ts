@@ -3,6 +3,10 @@ import { UnknownEventData, VerifyEventTypes } from '../streamerbot-event.types';
 export type TwitchEvents = VerifyEventTypes<
   'Twitch',
   {
+    AutomaticRewardRedemption: UnknownEventData;
+    AutoModMessageHeld: UnknownEventData;
+    AutoModMessageUpdate: UnknownEventData;
+    BlockedTermsAdded: UnknownEventData;
     AdMidRoll: TwitchAdMidRoll;
     AdRun: TwitchAdRun;
     Announcement: TwitchAnnouncement;
@@ -96,13 +100,42 @@ export type TwitchEvents = VerifyEventTypes<
     StreamUpdateGameOnConnect: UnknownEventData;
     Sub: TwitchSub;
     SubCounterRollover: UnknownEventData;
+    UnbanRequestApproved: UnknownEventData;
+    UnbanRequestCreated: UnknownEventData;
+    UnbanRequestDenied: UnknownEventData;
     UpcomingAd: undefined;
     UserBanned: TwitchUserBanned;
+    UserUnbanned: UnknownEventData;
     UserTimedOut: TwitchUserTimedOut;
     UserUntimedOut: UnknownEventData;
     ViewerCountUpdate: TwitchViewerCountUpdate;
+    VipRemoved: undefined;
     VipAdded: undefined;
     Whisper: TwitchWhisper;
+    BlockedTermsDeleted: UnknownEventData;
+    WarnedUser: UnknownEventData;
+    SuspiciousUserUpdate: UnknownEventData;
+    PermittedTermsAdded: UnknownEventData;
+    PermittedTermsDeleted: UnknownEventData;
+    WarningAcknowledged: UnknownEventData;
+    WatchStreak: UnknownEventData;
+    PollArchived: UnknownEventData;
+    SharedChatSessionBegin: UnknownEventData;
+    SharedChatSessionUpdate: UnknownEventData;
+    SharedChatSessionEnd: UnknownEventData;
+    PrimePaidUpgrade: UnknownEventData;
+    PayItForward: UnknownEventData;
+    GiftPaidUpgrade: UnknownEventData;
+    BitsBadgeTier: UnknownEventData;
+    SharedAnnouncement: UnknownEventData;
+    SharedRaid: UnknownEventData;
+    SharedPrimePaidUpgrade: UnknownEventData;
+    SharedGiftPaidUpgrade: UnknownEventData;
+    SharedPayItForward: UnknownEventData;
+    SharedSub: UnknownEventData;
+    SharedResub: UnknownEventData;
+    SharedSubGift: UnknownEventData;
+    SharedCommunitySubGift: UnknownEventData;
   }
 >;
 

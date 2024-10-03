@@ -21,6 +21,14 @@ export type YouTubeEvents = VerifyEventTypes<
     SuperChat: UnknownEventData;
     SuperSticker: UnknownEventData;
     UserBanned: UnknownEventData;
+    SevenTVEmoteAdded: UnknownEventData;
+    SevenTVEmoteRemoved: UnknownEventData;
+    BetterTTVEmoteAdded: UnknownEventData;
+    BetterTTVEmoteRemoved: UnknownEventData;
+    BroadcastMonitoringStarted: UnknownEventData;
+    BroadcastMonitoringEnded: UnknownEventData
+    BroadcastAdded: UnknownEventData
+    BroadcastRemoved: UnknownEventData
   }
 >;
 
