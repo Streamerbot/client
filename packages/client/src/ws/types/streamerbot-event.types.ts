@@ -58,12 +58,15 @@ export type StreamerbotEventsBySource = VerifyEventSources<{
   FileWatcher: any;
   Fourthwall: any;
   General: any;
+  Group: any;
   HotKey: any;
   HypeRate: any;
   Kofi: any;
+  MeldStudio: any;
   Midi: any;
   Misc: any;
   Obs: any;
+  Pallygg: any;
   Patreon: any;
   Pulsoid: any;
   Quote: any;
@@ -73,13 +76,15 @@ export type StreamerbotEventsBySource = VerifyEventSources<{
   SpeechToText: any;
   StreamDeck: any;
   StreamElements: any;
+  StreamerBotRemote: any;
   Streamlabs: any;
   StreamlabsDesktop: any;
   ThrowingSystem: any;
   TipeeeStream: any;
   TreatStream: any;
   Trovo: any;
-  Twitch: TwitchEvents
+  Twitch: TwitchEvents;
+  VoiceMod: any;
   VStream: any;
   VTubeStudio: any;
   WebsocketClient: any;
