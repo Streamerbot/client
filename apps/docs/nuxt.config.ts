@@ -67,6 +67,7 @@ export default defineNuxtConfig({
       '/get-started': { redirect: { to: '/get-started/installation', statusCode: 301 } },
       '/guide': { redirect: { to: '/guide/actions', statusCode: 301 } },
       '/api': { redirect: { to: '/api/config', statusCode: 301 } },
+      '/api/methods': { redirect: { to: '/api/requests', statusCode: 301 } },
     },
     prerender: {
       crawlLinks: true,
