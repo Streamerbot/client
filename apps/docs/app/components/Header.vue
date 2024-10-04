@@ -35,7 +35,7 @@ const navigation = inject<ComputedRef<any[]>>('navigation')
     </template>
 
     <template #right>
-      <UDocsSearchButton size="sm" class="max-w-xs" />
+      <UContentSearchButton size="sm" class="max-w-xs" />
       <UColorModeButton />
     </template>
 

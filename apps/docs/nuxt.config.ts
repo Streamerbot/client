@@ -1,7 +1,15 @@
 export default defineNuxtConfig({
   extends: ['@nuxt/ui-pro'],
 
-  modules: ['@nuxt/ui', '@vueuse/nuxt', 'nuxt-og-image', 'nuxt-link-checker', '@nuxt/content', '@nuxt/image'],
+  modules: [
+    '@nuxt/ui',
+    '@vueuse/nuxt',
+    'nuxt-og-image',
+    'nuxt-link-checker',
+    '@nuxt/content',
+    '@nuxt/image',
+    '@nuxt/fonts'
+  ],
 
   app: {
     baseURL: '/client',
@@ -10,27 +18,15 @@ export default defineNuxtConfig({
     },
   },
 
-  imports: {
-    dirs: ['composables'],
-  },
-
   site: {
     url: 'https://streamerbot.github.io/client',
     name: 'Streamer.bot WebSocket Client',
     twitterCard: 'summary_large_image',
   },
 
-  ui: {
-    global: true,
-    icons: ['mdi', 'heroicons', 'simple-icons', 'vscode-icons', 'logos', 'carbon', 'skill-icons'],
-  },
-
   colorMode: {
     preference: 'dark',
-  },
-
-  devtools: {
-    enabled: true,
+    fallback: 'dark',
   },
 
   content: {
@@ -63,14 +59,6 @@ export default defineNuxtConfig({
         'xml',
         'diff',
       ],
-    },
-  },
-
-  googleFonts: {
-    display: 'swap',
-    download: true,
-    families: {
-      'DM+Sans': [400, 500, 600, 700],
     },
   },
 
@@ -108,4 +96,10 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: '2024-09-25',
+
+  $development: {
+    devtools: {
+      enabled: true,
+    },
+  }
 });

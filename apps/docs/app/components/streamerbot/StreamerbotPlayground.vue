@@ -11,7 +11,7 @@ const {
   data,
   error,
   connect,
-  disconnect
+  disconnect,
 } = useStreamerbot({
   host,
   port,
@@ -36,7 +36,7 @@ const clientOptionsCode = computed(() => {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
     <UCard class="w-auto">
       <template #header>
         <h3 class="text-lg font-semibold">
@@ -87,10 +87,24 @@ const clientOptionsCode = computed(() => {
 
   <UAlert v-if="error" title="WebSocket Error" :description="error" color="red" variant="soft" class="mt-3" />
 
-  <UCard v-if="status === 'OPEN'" class="mt-3">
-    <template #header>
-      <h3 class="text-lg font-semibold">Last Message Received</h3>
-    </template>
-    <pre><code>{{ data }}</code></pre>
-  </UCard>
+  <template v-if="status === 'OPEN'">
+    <div class="flex flex-wrap gap-1 my-3">
+      <UButton color="gray" @click="() => client.getInfo()">Get Info</UButton>
+      <UButton color="gray" @click="() => client.getEvents()">Get Events</UButton>
+      <UButton color="gray" @click="() => client.getActions()">Get Actions</UButton>
+      <UButton color="gray" @click="() => client.getBroadcaster()">Get Broadcaster</UButton>
+      <UButton color="gray" @click="() => client.getCredits()">Get Credits</UButton>
+      <UButton color="gray" @click="() => client.getActiveViewers()">Get Active Viewers</UButton>
+      <UButton color="gray" @click="() => client.getCodeTriggers()">Get Code Triggers</UButton>
+      <UButton color="gray" @click="() => client.getCommands()">Get Commands</UButton>
+      <UButton color="gray" @click="() => client.twitchGetEmotes()">Get Emotes (Twitch)</UButton>
+      <UButton color="gray" @click="() => client.youtubeGetEmotes()">Get Emotes (YouTube)</UButton>
+    </div>
+    <UCard class="mt-3">
+      <template #header>
+        <h3 class="text-lg font-semibold">Last Message Received</h3>
+      </template>
+      <pre><code>{{ data }}</code></pre>
+    </UCard>
+  </template>
 </template>

@@ -48,11 +48,11 @@ const { communityLinks, ecosystemLinks } = useLinks(page);
 
       <hr v-if="surround?.length">
 
-      <UDocsSurround :surround="(surround as ParsedContent[])" />
+      <UContentSurround :surround="(surround as ParsedContent[])" />
     </UPageBody>
 
     <template #right>
-      <UDocsToc :links="page.body?.toc.links">
+      <UContentToc :links="page.body?.toc.links">
         <template #bottom>
           <div class="hidden lg:block space-y-6 !mt-6">
             <UDivider v-if="page.body?.toc?.links?.length" type="dashed" />
@@ -61,7 +61,7 @@ const { communityLinks, ecosystemLinks } = useLinks(page);
             <UPageLinks title="Ecosystem" :links="ecosystemLinks" />
           </div>
         </template>
-      </UDocsToc>
+      </UContentToc>
     </template>
   </UPage>
 </template>

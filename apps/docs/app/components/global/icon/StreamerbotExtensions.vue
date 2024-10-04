@@ -1,5 +1,5 @@
 <script setup></script>
 
 <template>
-  <IconBase src="/img/icons/streamerbot-extensions.svg" />
+  <IconBase src="/client/img/icons/streamerbot-extensions.svg" />
 </template>
