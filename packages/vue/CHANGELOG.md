@@ -1,6 +1,17 @@
 # @streamerbot/vue
 
-## 2.0.0
+## 1.6.0
+
+### Minor Changes
+
+- Streamer.bot v0.2.5 updates
+
+### Patch Changes
+
+- Updated dependencies
+  - @streamerbot/client@1.6.0
+
+## 1.5.0
 
 ### Patch Changes
 
@@ -13,7 +24,7 @@
 
 - fix exports
 
-## 2.0.0
+## 1.3.2
 
 ### Minor Changes
 
@@ -32,7 +43,7 @@
 - Updated dependencies [77c305a]
   - @streamerbot/client@1.3.1
 
-## 2.0.0
+## 1.3.0
 
 ### Minor Changes
 
@@ -51,7 +62,7 @@
 - Updated dependencies
   - @streamerbot/client@1.2.1
 
-## 2.0.0
+## 1.2.0
 
 ### Minor Changes
 

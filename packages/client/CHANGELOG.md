@@ -1,5 +1,11 @@
 # @streamerbot/client
 
+## 1.6.0
+
+### Minor Changes
+
+- Streamer.bot v0.2.5 updates
+
 ## 1.5.1
 
 ### Patch Changes
