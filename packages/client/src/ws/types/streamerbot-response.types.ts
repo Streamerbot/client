@@ -1,7 +1,8 @@
 import { StreamerbotAction } from './streamerbot-action.types';
 import {
   BroadcasterPlatform,
-  BroadcasterPlatforms
+  BroadcasterPlatforms,
+  MonitoredYouTubeBroadcast
 } from './streamerbot-broadcaster.types';
 import { StreamerbotCredits } from './streamerbot-credits.types';
 import {
@@ -40,6 +41,11 @@ export type GetBroadcasterResponse = StreamerbotResponse<{
   connected: Array<BroadcasterPlatform>;
   disconnected: Array<BroadcasterPlatform>;
 }>;
+
+export type GetMonitoredYouTubeBroadcastsResponse = StreamerbotResponse<{
+  broadcasts: Array<MonitoredYouTubeBroadcast>;
+  count: number;
+}>
 
 export type GetCreditsResponse = StreamerbotResponse<StreamerbotCredits>;
 export type TestCreditsResponse = StreamerbotResponse<StreamerbotCredits>;

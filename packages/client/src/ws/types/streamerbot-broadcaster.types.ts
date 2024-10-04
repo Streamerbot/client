@@ -60,3 +60,22 @@ export type BroadcasterPlatforms = {
 };
 
 export type BroadcasterPlatform = keyof BroadcasterPlatforms;
+
+export type MonitoredYouTubeBroadcast = {
+  actualEndTime: string;
+  actualStartTime: string;
+  categoryId: string;
+  channelId: string;
+  description: string;
+  id: string;
+  liveChatId: string;
+  privacy: 'public' | 'private' | 'unlisted' | (string & {});
+  publishedAt: string;
+  scheduledEndTime: string;
+  scheduledStartTime: string;
+  status: 'ready' | 'complete' | (string & {});
+  title: string;
+  tags: string[];
+  defaultLanguage: string;
+  defaultAudioLanguage: string;
+}

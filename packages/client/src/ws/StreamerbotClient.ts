@@ -19,12 +19,14 @@ import {
   GetCreditsResponse,
   GetEventsResponse,
   GetInfoResponse,
+  GetMonitoredYouTubeBroadcastsResponse,
   StreamerbotResponseTypes,
   SubscribeResponse,
   TestCreditsResponse,
   UnsubscribeResponse
 } from './types/streamerbot-response.types';
 import { generateRequestId, getCloseEventReason } from './util/websocket.util';
+import { StreamerbotRequest } from './types/streamerbot-request.types';
 
 export type StreamerbotClientOptions = {
   scheme: 'ws' | 'wss' | string;
@@ -312,7 +314,7 @@ export class StreamerbotClient {
    * wait for the response, and return the response data
    */
   public async request<T extends StreamerbotResponseTypes>(
-    request: any,
+    request: StreamerbotRequest,
     id: string = '',
     timeout: number = 5000
   ): Promise<T> {
@@ -535,6 +537,17 @@ export class StreamerbotClient {
   public async getBroadcaster(): Promise<GetBroadcasterResponse> {
     return await this.request<GetBroadcasterResponse>({
       request: 'GetBroadcaster',
+    });
+  }
+
+  /**
+   * Get all monitored YouTube broadcasts
+   *
+   * @version 0.2.5
+   */
+  public async getMonitoredYouTubeBroadcasts(): Promise<GetMonitoredYouTubeBroadcastsResponse> {
+    return await this.request<GetMonitoredYouTubeBroadcastsResponse>({
+      request: 'GetMonitoredYouTubeBroadcasts',
     });
   }
 
