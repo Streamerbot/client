@@ -12,7 +12,10 @@ export type StreamerbotRequestName =
   | 'GetInfo'
   | 'GetActiveViewers'
   | 'ExecuteCodeTrigger'
-  | 'GetCodeTriggers';
+  | 'GetCodeTriggers'
+  | 'GetCommands'
+  | 'TwitchGetEmotes'
+  | 'YouTubeGetEmotes';
 
 export type StreamerbotRequest = {
   request: StreamerbotRequestName;

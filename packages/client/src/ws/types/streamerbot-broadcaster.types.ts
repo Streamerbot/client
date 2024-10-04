@@ -75,7 +75,13 @@ export type MonitoredYouTubeBroadcast = {
   scheduledStartTime: string;
   status: 'ready' | 'complete' | (string & {});
   title: string;
-  tags: string[];
+  tags: Array<string>;
   defaultLanguage: string;
   defaultAudioLanguage: string;
+}
+
+export type Emote = {
+  type: string;
+  name: string;
+  imageUrl: string;
 }

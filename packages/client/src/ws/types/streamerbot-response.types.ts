@@ -2,8 +2,10 @@ import { StreamerbotAction } from './streamerbot-action.types';
 import {
   BroadcasterPlatform,
   BroadcasterPlatforms,
+  Emote,
   MonitoredYouTubeBroadcast
 } from './streamerbot-broadcaster.types';
+import { StreamerbotCommand } from './streamerbot-command.types';
 import { StreamerbotCredits } from './streamerbot-credits.types';
 import {
   StreamerbotEventsSubscription,
@@ -71,6 +73,28 @@ export type GetCodeTriggersResponse = StreamerbotResponse<{
   count: number;
 }>;
 
+export type GetCommandsResponse = StreamerbotResponse<{
+  commands: Array<StreamerbotCommand>;
+  count: number;
+}>
+
+export type TwitchGetEmotesResponse = StreamerbotResponse<{
+  emotes: {
+    userEmotes: Array<Emote>;
+    bttvEmotes: Array<Emote>;
+    ffzEmotes: Array<Emote>;
+    sevenTvEmotes: Array<Emote>;
+  }
+}>;
+
+export type YouTubeGetEmotesResponse = StreamerbotResponse<{
+  emotes: {
+    userEmotes: Array<Emote>;
+    bttvEmotes: Array<Emote>;
+    sevenTvEmotes: Array<Emote>;
+  }
+}>;
+
 export type StreamerbotResponseTypes =
   | StreamerbotResponse<unknown>
   | SubscribeResponse
@@ -79,10 +103,14 @@ export type StreamerbotResponseTypes =
   | GetActionsResponse
   | DoActionResponse
   | GetBroadcasterResponse
+  | GetMonitoredYouTubeBroadcastsResponse
   | GetCreditsResponse
   | TestCreditsResponse
   | ClearCreditsResponse
   | GetInfoResponse
   | GetActiveViewersResponse
   | ExecuteCodeTriggerResponse
-  | GetCodeTriggersResponse;
+  | GetCodeTriggersResponse
+  | GetCommandsResponse
+  | TwitchGetEmotesResponse
+  | YouTubeGetEmotesResponse;

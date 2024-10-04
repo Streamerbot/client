@@ -16,6 +16,7 @@ import {
   GetActiveViewersResponse,
   GetBroadcasterResponse,
   GetCodeTriggersResponse,
+  GetCommandsResponse,
   GetCreditsResponse,
   GetEventsResponse,
   GetInfoResponse,
@@ -23,7 +24,9 @@ import {
   StreamerbotResponseTypes,
   SubscribeResponse,
   TestCreditsResponse,
-  UnsubscribeResponse
+  TwitchGetEmotesResponse,
+  UnsubscribeResponse,
+  YouTubeGetEmotesResponse
 } from './types/streamerbot-response.types';
 import { generateRequestId, getCloseEventReason } from './util/websocket.util';
 import { StreamerbotRequest } from './types/streamerbot-request.types';
@@ -616,6 +619,39 @@ export class StreamerbotClient {
   public async getCodeTriggers(): Promise<GetCodeTriggersResponse> {
     return await this.request<GetCodeTriggersResponse>({
       request: 'GetCodeTriggers',
+    });
+  }
+
+  /**
+   * Get commands for the connected Streamer.bot instance
+   *
+   * @version 0.2.5
+   */
+  public async getCommands(): Promise<GetCommandsResponse> {
+    return await this.request<GetCommandsResponse>({
+      request: 'GetCommands',
+    });
+  };
+
+  /**
+   * Get Twitch emotes for the connected Streamer.bot instance
+   *
+   * @version 0.2.5
+   */
+  public async twitchGetEmotes(): Promise<TwitchGetEmotesResponse> {
+    return await this.request<TwitchGetEmotesResponse>({
+      request: 'TwitchGetEmotes',
+    });
+  }
+
+  /**
+   * Get YouTube emotes for the connected Streamer.bot instance
+   *
+   * @version 0.2.5
+   */
+  public async youtubeGetEmotes(): Promise<YouTubeGetEmotesResponse> {
+    return await this.request<YouTubeGetEmotesResponse>({
+      request: 'YouTubeGetEmotes',
     });
   }
 }
