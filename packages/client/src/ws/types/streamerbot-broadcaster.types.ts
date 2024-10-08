@@ -1,3 +1,5 @@
+export type StreamerbotPlatform = 'twitch' | 'youtube' | 'trovo';
+
 export type TwitchBroadcaster = {
   broadcastUser: string;
   broadcastUserName: string;

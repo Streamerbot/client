@@ -1,4 +1,11 @@
 /**
+ * Prettify hover overlays
+ */
+export type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};
+
+/**
  * Recursively makes all properties of an object writable.
  */
 export type DeepWriteable<T> = { -readonly [P in keyof T]: DeepWriteable<T[P]> };

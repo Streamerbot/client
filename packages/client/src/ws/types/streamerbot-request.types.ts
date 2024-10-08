@@ -15,7 +15,16 @@ export type StreamerbotRequestName =
   | 'GetCodeTriggers'
   | 'GetCommands'
   | 'TwitchGetEmotes'
-  | 'YouTubeGetEmotes';
+  | 'YouTubeGetEmotes'
+  | 'GetGlobals'
+  | 'GetGlobal'
+  | 'TwitchGetUserGlobals'
+  | 'TwitchGetUserGlobal'
+  | 'YouTubeGetUserGlobals'
+  | 'YouTubeGetUserGlobal'
+  | 'TrovoGetUserGlobals'
+  | 'TrovoGetUserGlobal'
+;
 
 export type StreamerbotRequest = {
   request: StreamerbotRequestName;

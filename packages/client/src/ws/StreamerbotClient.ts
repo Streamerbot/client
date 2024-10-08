@@ -1,5 +1,5 @@
 import WebSocket from 'isomorphic-ws';
-import { StreamerbotAction, StreamerbotInfo } from './types';
+import { StreamerbotAction, StreamerbotInfo, StreamerbotPlatform } from './types';
 import { StreamerbotEvents } from './types/events';
 import {
   StreamerbotEventName,
@@ -19,8 +19,12 @@ import {
   GetCommandsResponse,
   GetCreditsResponse,
   GetEventsResponse,
+  GetGlobalResponse,
+  GetGlobalsResponse,
   GetInfoResponse,
   GetMonitoredYouTubeBroadcastsResponse,
+  GetUserGlobalResponse,
+  GetUserGlobalsResponse,
   StreamerbotResponseTypes,
   SubscribeResponse,
   TestCreditsResponse,
@@ -29,7 +33,7 @@ import {
   YouTubeGetEmotesResponse
 } from './types/streamerbot-response.types';
 import { generateRequestId, getCloseEventReason } from './util/websocket.util';
-import { StreamerbotRequest } from './types/streamerbot-request.types';
+import { StreamerbotRequest, StreamerbotRequestName } from './types/streamerbot-request.types';
 
 export type StreamerbotClientOptions = {
   scheme: 'ws' | 'wss' | string;
@@ -237,7 +241,7 @@ export class StreamerbotClient {
         this._reconnectTimeout = setTimeout(() => {
           console.log(`Reconnecting... (attempt ${this.retried})`);
           this.connect().catch(console.error);
-        }, Math.max(10000, this.retried * 1000));
+        }, Math.max(10_000, this.retried * 1_000));
       }
       else this.cleanup();
     } else {
@@ -652,6 +656,100 @@ export class StreamerbotClient {
   public async youtubeGetEmotes(): Promise<YouTubeGetEmotesResponse> {
     return await this.request<YouTubeGetEmotesResponse>({
       request: 'YouTubeGetEmotes',
+    });
+  }
+
+  /**
+   * Get all global variables
+   *
+   * @version 0.2.5
+   */
+  public async getGlobals(): Promise<GetGlobalsResponse> {
+    return await this.request<GetGlobalsResponse>({
+      request: 'GetGlobals',
+    });
+  }
+
+  /**
+   * Get a global variable by name
+   *
+   * @version 0.2.5
+   * @param name The name of the global variable to fetch
+   * @param persisted Whether the global variable is persisted
+   */
+  public async getGlobal<T, K extends string = string>(name: K, persisted = true): Promise<GetGlobalResponse<T, K>> {
+    return await this.request<GetGlobalResponse<T, K>>({
+      request: 'GetGlobal',
+      variable: name,
+      persisted,
+    });
+  }
+
+  /**
+   * Get user global variables
+   *
+   * @version 0.2.5
+   * @param platform The platform to fetch globals for (twitch, youtube, trovo)
+   * @param name Optional name of the global user variable to fetch
+   * @param persisted Whether the global variable is persisted
+   */
+  public async getUserGlobals<
+    T,
+    K extends string = string,
+    P extends StreamerbotPlatform = StreamerbotPlatform
+  >(
+    platform: P,
+    name: K | null = null,
+    persisted = true
+  ): Promise<GetUserGlobalsResponse<T, K, P>> {
+    const platformToRequest: Record<StreamerbotPlatform, StreamerbotRequestName> = {
+      'twitch': 'TwitchGetUserGlobals',
+      'youtube': 'YouTubeGetUserGlobals',
+      'trovo': 'TrovoGetUserGlobals',
+    };
+    const request = platformToRequest[platform];
+    if (!request) throw new Error('Invalid platform');
+
+    return await this.request<GetUserGlobalsResponse<T, K, P>>({
+      request,
+      variable: name,
+      persisted,
+    });
+  }
+
+  /**
+   * Get user global variables
+   *
+   * @version 0.2.5
+   * @param platform The platform to fetch globals for (twitch, youtube, trovo)
+   * @param userId The user ID to fetch globals for
+   * @param name Optional name of the global variable to fetch
+   * @param persisted Whether the global variable is persisted
+   */
+  public async getUserGlobal<
+    T,
+    K extends string = string,
+    U extends string = string,
+    P extends StreamerbotPlatform = StreamerbotPlatform,
+  >(
+    platform: P,
+    userId: U,
+    name: K | null = null,
+    persisted = true
+  ): Promise<GetUserGlobalResponse<T, K, U, P>> {
+    const platformToRequest: Record<StreamerbotPlatform, StreamerbotRequestName> = {
+      'twitch': 'TwitchGetUserGlobal',
+      'youtube': 'YouTubeGetUserGlobal',
+      'trovo': 'TrovoGetUserGlobal',
+    };
+    const request = platformToRequest[platform];
+    if (!request) throw new Error('Invalid platform');
+
+    return await this.request<GetUserGlobalResponse<T, K, U, P>>({
+      request,
+      userId,
+      variable: name,
+      persisted,
     });
   }
 }

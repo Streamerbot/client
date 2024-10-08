@@ -3,7 +3,8 @@ import {
   BroadcasterPlatform,
   BroadcasterPlatforms,
   Emote,
-  MonitoredYouTubeBroadcast
+  MonitoredYouTubeBroadcast,
+  StreamerbotPlatform
 } from './streamerbot-broadcaster.types';
 import { StreamerbotCommand } from './streamerbot-command.types';
 import { StreamerbotCredits } from './streamerbot-credits.types';
@@ -11,13 +12,15 @@ import {
   StreamerbotEventsSubscription,
   StreamerbotEventsType
 } from './streamerbot-event.types';
+import { StreamerbotGlobalVariable, StreamerbotGlobalVariableName, StreamerbotUserGlobalVariable, StreamerbotVariableValue } from './streamerbot-global.types';
 import { StreamerbotInfo } from './streamerbot-info.types';
 import { StreamerbotViewer } from './streamerbot-viewer.types.ts';
+import { Prettify } from './util.types';
 
-export type StreamerbotResponse<T> = T & {
+export type StreamerbotResponse<T> = Prettify<T & {
   id: string;
   status: 'ok' | 'error';
-};
+}>;
 
 export type SubscribeResponse = StreamerbotResponse<{
   events: StreamerbotEventsSubscription;
@@ -93,6 +96,35 @@ export type YouTubeGetEmotesResponse = StreamerbotResponse<{
     bttvEmotes: Array<Emote>;
     sevenTvEmotes: Array<Emote>;
   }
+}>;
+
+export type GetGlobalsResponse = StreamerbotResponse<{
+  variables: Record<StreamerbotGlobalVariableName, StreamerbotGlobalVariable>;
+  count: number;
+}>;
+
+export type GetGlobalResponse<T, K = string> = StreamerbotResponse<{
+  variables: Record<K extends string ? K : string, StreamerbotGlobalVariable<T, K>>;
+  count: number;
+}>;
+
+export type GetUserGlobalsResponse<
+  T = StreamerbotVariableValue,
+  K = string,
+  P = StreamerbotPlatform
+> = StreamerbotResponse<{
+  variables: Record<K extends string ? K : string, StreamerbotUserGlobalVariable<T, K, string, P>>;
+  count: number;
+}>;
+
+export type GetUserGlobalResponse<
+  T = StreamerbotVariableValue,
+  K = string,
+  U = string,
+  P = StreamerbotPlatform
+> = StreamerbotResponse<{
+  variables: Record<K extends string ? K : string, StreamerbotUserGlobalVariable<T, K, U, P>>;
+  count: number;
 }>;
 
 export type StreamerbotResponseTypes =

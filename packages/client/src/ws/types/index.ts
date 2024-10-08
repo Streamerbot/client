@@ -6,4 +6,5 @@ export * from './streamerbot-info.types';
 export * from './streamerbot-response.types';
 export * from './streamerbot-viewer.types.ts';
 export * from './streamerbot-command.types';
+export * from './streamerbot-global.types';
 export * from './websocket.types';
