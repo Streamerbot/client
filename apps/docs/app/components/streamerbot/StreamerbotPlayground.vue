@@ -33,6 +33,8 @@ const clientOptionsCode = computed(() => {
   endpoint: '${endpoint.value}'
 });`;
 });
+
+const lastRequestResponse = ref<any>();
 </script>
 
 <template>
@@ -88,23 +90,40 @@ const clientOptionsCode = computed(() => {
   <UAlert v-if="error" title="WebSocket Error" :description="error" color="red" variant="soft" class="mt-3" />
 
   <template v-if="status === 'OPEN'">
-    <div class="flex flex-wrap gap-1 my-3">
-      <UButton color="gray" @click="() => client.getInfo()">Get Info</UButton>
-      <UButton color="gray" @click="() => client.getEvents()">Get Events</UButton>
-      <UButton color="gray" @click="() => client.getActions()">Get Actions</UButton>
-      <UButton color="gray" @click="() => client.getBroadcaster()">Get Broadcaster</UButton>
-      <UButton color="gray" @click="() => client.getCredits()">Get Credits</UButton>
-      <UButton color="gray" @click="() => client.getActiveViewers()">Get Active Viewers</UButton>
-      <UButton color="gray" @click="() => client.getCodeTriggers()">Get Code Triggers</UButton>
-      <UButton color="gray" @click="() => client.getCommands()">Get Commands</UButton>
-      <UButton color="gray" @click="() => client.twitchGetEmotes()">Get Emotes (Twitch)</UButton>
-      <UButton color="gray" @click="() => client.youtubeGetEmotes()">Get Emotes (YouTube)</UButton>
-    </div>
+    <UCard class="my-3">
+      <template #header>
+        <h3 class="text-lg font-semibold">Test Client Requests</h3>
+      </template>
+
+      <div class="grid grid-cols-3 gap-3">
+        <div class="flex flex-col gap-1">
+          <UButton color="gray" @click="async () => lastRequestResponse = await client.getInfo()">Get Info</UButton>
+          <UButton color="gray" @click="async () => lastRequestResponse = await client.getEvents()">Get Events</UButton>
+          <UButton color="gray" @click="async () => lastRequestResponse = await client.getActions()">Get Actions</UButton>
+          <UButton color="gray" @click="async () => lastRequestResponse = await client.getBroadcaster()">Get Broadcaster</UButton>
+          <UButton color="gray" @click="async () => lastRequestResponse = await client.getCredits()">Get Credits</UButton>
+          <UButton color="gray" @click="async () => lastRequestResponse = await client.getActiveViewers()">Get Active Viewers</UButton>
+          <UButton color="gray" @click="async () => lastRequestResponse = await client.getCodeTriggers()">Get Code Triggers</UButton>
+          <UButton color="gray" @click="async () => lastRequestResponse = await client.getCommands()">Get Commands</UButton>
+          <UButton color="gray" @click="async () => lastRequestResponse = await client.getEmotes('twitch')">Get Emotes (Twitch)</UButton>
+          <UButton color="gray" @click="async () => lastRequestResponse = await client.getEmotes('youtube')">Get Emotes (YouTube)</UButton>
+          <UButton color="gray" @click="async () => lastRequestResponse = await client.getGlobals()">Get Globals</UButton>
+          <UButton color="gray" @click="async () => lastRequestResponse = await client.getGlobal('test')">Get Global (test)</UButton>
+          <UButton color="gray" @click="async () => lastRequestResponse = await client.getUserGlobals('twitch', 'test')">Get Twitch User Globals (test)</UButton>
+          <UButton color="gray" @click="async () => lastRequestResponse = await client.getUserGlobal('twitch', '54601714')">Get Twitch User Global</UButton>
+          <UButton color="gray" @click="async () => lastRequestResponse = await client.getUserGlobal('twitch', '54601714', 'test')">Get Twitch User Global (test)</UButton>
+        </div>
+        <div class="col-span-2 p-3 rounded-lg bg-gray-900 max-h-[600px] overflow-auto">
+          <code class="whitespace-pre">{{ lastRequestResponse }}</code>
+        </div>
+      </div>
+    </UCard>
+
     <UCard class="mt-3">
       <template #header>
-        <h3 class="text-lg font-semibold">Last Message Received</h3>
+        <h3 class="text-lg font-semibold">Last Message Received (Raw)</h3>
       </template>
-      <pre><code>{{ data }}</code></pre>
+      <code class="whitespace-pre">{{ data }}</code>
     </UCard>
   </template>
 </template>
