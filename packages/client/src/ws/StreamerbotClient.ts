@@ -736,7 +736,7 @@ export class StreamerbotClient {
     userId: U,
     name: K | null = null,
     persisted = true
-  ): Promise<GetUserGlobalResponse<T, K, U, P>> {
+  ): Promise<GetUserGlobalResponse<T, K>> {
     const platformToRequest: Record<StreamerbotPlatform, StreamerbotRequestName> = {
       'twitch': 'TwitchGetUserGlobal',
       'youtube': 'YouTubeGetUserGlobal',
@@ -745,7 +745,7 @@ export class StreamerbotClient {
     const request = platformToRequest[platform];
     if (!request) throw new Error('Invalid platform');
 
-    return await this.request<GetUserGlobalResponse<T, K, U, P>>({
+    return await this.request<GetUserGlobalResponse<T, K>>({
       request,
       userId,
       variable: name,

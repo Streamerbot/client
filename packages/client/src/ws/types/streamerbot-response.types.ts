@@ -120,10 +120,8 @@ export type GetUserGlobalsResponse<
 export type GetUserGlobalResponse<
   T = StreamerbotVariableValue,
   K = string,
-  U = string,
-  P = StreamerbotPlatform
 > = StreamerbotResponse<{
-  variables: Record<K extends string ? K : string, StreamerbotUserGlobalVariable<T, K, U, P>>;
+  variables: Record<K extends string ? K : string, StreamerbotGlobalVariable<T, K>>;
   count: number;
 }>;
 
