@@ -1,5 +1,5 @@
 import WebSocket from 'isomorphic-ws';
-import { StreamerbotAction, StreamerbotInfo, StreamerbotPlatform } from './types';
+import { StreamerbotAction, StreamerbotInfo, StreamerbotPlatform, StreamerbotVariableValue } from './types';
 import { StreamerbotEvents } from './types/events';
 import {
   StreamerbotEventName,
@@ -8,6 +8,7 @@ import {
   StreamerbotEventsSubscription,
   StreamerbotEventsTypeWriteable
 } from './types/streamerbot-event.types';
+import { StreamerbotRequest, StreamerbotRequestName } from './types/streamerbot-request.types';
 import {
   ClearCreditsResponse,
   DoActionResponse,
@@ -33,7 +34,6 @@ import {
   YouTubeGetEmotesResponse
 } from './types/streamerbot-response.types';
 import { generateRequestId, getCloseEventReason } from './util/websocket.util';
-import { StreamerbotRequest, StreamerbotRequestName } from './types/streamerbot-request.types';
 
 export type StreamerbotClientOptions = {
   scheme: 'ws' | 'wss' | string;
@@ -215,6 +215,8 @@ export class StreamerbotClient {
       }
 
       const infoResponse = await this.getInfo();
+      if (infoResponse.status !== 'ok') throw new Error('Failed to fetch Streamer.bot instance information');
+
       this?.options?.onConnect?.(infoResponse.info);
     } catch (e) {
       console.error('Error invoking onOpen handler', e);
@@ -676,12 +678,24 @@ export class StreamerbotClient {
    * @param name The name of the global variable to fetch
    * @param persisted Whether the global variable is persisted
    */
-  public async getGlobal<T, K extends string = string>(name: K, persisted = true): Promise<GetGlobalResponse<T, K>> {
-    return await this.request<GetGlobalResponse<T, K>>({
+  public async getGlobal<
+    T extends StreamerbotVariableValue,
+    K extends string = string
+  >(name: K, persisted = true) {
+    const response = await this.request<GetGlobalResponse<T, K>>({
       request: 'GetGlobal',
       variable: name,
       persisted,
     });
+    if (response.status === 'ok') {
+      if (!response.variables[name]) return { status: 'error', error: 'Variable not found' };
+      return {
+        id: response.id,
+        status: response.status,
+        variable: response.variables[name],
+      };
+    }
+    return response;
   }
 
   /**
@@ -693,7 +707,7 @@ export class StreamerbotClient {
    * @param persisted Whether the global variable is persisted
    */
   public async getUserGlobals<
-    T,
+    T extends StreamerbotVariableValue,
     K extends string = string,
     P extends StreamerbotPlatform = StreamerbotPlatform
   >(
@@ -726,7 +740,7 @@ export class StreamerbotClient {
    * @param persisted Whether the global variable is persisted
    */
   public async getUserGlobal<
-    T,
+    T extends StreamerbotVariableValue,
     K extends string = string,
     U extends string = string,
     P extends StreamerbotPlatform = StreamerbotPlatform,
@@ -735,7 +749,7 @@ export class StreamerbotClient {
     userId: U,
     name: K | null = null,
     persisted = true
-  ): Promise<GetUserGlobalResponse<T, K>> {
+  ) {
     const platformToRequest: Record<StreamerbotPlatform, StreamerbotRequestName> = {
       'twitch': 'TwitchGetUserGlobal',
       'youtube': 'YouTubeGetUserGlobal',
@@ -744,11 +758,22 @@ export class StreamerbotClient {
     const request = platformToRequest[platform];
     if (!request) throw new Error('Invalid platform');
 
-    return await this.request<GetUserGlobalResponse<T, K>>({
+    const response = await this.request<GetUserGlobalResponse<T, K>>({
       request,
       userId,
-      variable: name,
+      variable: name || null,
       persisted,
     });
+
+    if (response.status === 'ok' && userId && name) {
+      const variable = response.variables.find((v) => v.name === name);
+      if (!variable) return { status: 'error', error: 'Variable not found' };
+      return {
+        id: response.id,
+        status: response.status,
+        variable,
+      };
+    }
+    return response;
   }
 }

@@ -17,10 +17,14 @@ import { StreamerbotInfo } from './streamerbot-info.types';
 import { StreamerbotViewer } from './streamerbot-viewer.types.ts';
 import { Prettify } from './util.types';
 
-export type StreamerbotResponse<T> = Prettify<T & {
+export type StreamerbotResponse<T, TStatus = 'ok' | 'error'> = T & {
   id: string;
-  status: 'ok' | 'error';
-}>;
+  status: TStatus;
+};
+
+export type StreamerbotOkResponse<T> = StreamerbotResponse<T, 'ok'>;
+export type StreamerbotErrorResponse = StreamerbotResponse<{ error: string }, 'error'>;
+export type MaybeStreamerbotResponse<T> = StreamerbotOkResponse<T> | StreamerbotErrorResponse;
 
 export type SubscribeResponse = StreamerbotResponse<{
   events: StreamerbotEventsSubscription;
@@ -103,25 +107,25 @@ export type GetGlobalsResponse = StreamerbotResponse<{
   count: number;
 }>;
 
-export type GetGlobalResponse<T, K = string> = StreamerbotResponse<{
-  variables: Record<K extends string ? K : string, StreamerbotGlobalVariable<T, K>>;
+export type GetGlobalResponse<T extends StreamerbotVariableValue, K extends string = string> = MaybeStreamerbotResponse<{
+  variables: Record<K, Prettify<StreamerbotGlobalVariable<T, K>>>;
   count: number;
 }>;
 
 export type GetUserGlobalsResponse<
-  T = StreamerbotVariableValue,
-  K = string,
+  T extends StreamerbotVariableValue = StreamerbotVariableValue,
+  K extends string = string,
   P = StreamerbotPlatform
 > = StreamerbotResponse<{
-  variables: Record<K extends string ? K : string, StreamerbotUserGlobalVariable<T, K, string, P>>;
+  variables: StreamerbotUserGlobalVariable<T, K, string, P>[];
   count: number;
 }>;
 
 export type GetUserGlobalResponse<
-  T = StreamerbotVariableValue,
-  K = string,
-> = StreamerbotResponse<{
-  variables: Record<K extends string ? K : string, StreamerbotGlobalVariable<T, K>>;
+  T extends StreamerbotVariableValue = StreamerbotVariableValue,
+  K extends string = string,
+> = MaybeStreamerbotResponse<{
+  variables: StreamerbotGlobalVariable<T, K>[];
   count: number;
 }>;
 

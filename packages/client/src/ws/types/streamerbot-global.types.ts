@@ -4,15 +4,15 @@ export type StreamerbotGlobalVariableName = string;
 
 export type StreamerbotVariableValue = string | number | boolean | null;
 
-export type StreamerbotGlobalVariable<T = StreamerbotVariableValue, K = string> = {
-  name: K extends string ? K : string;
-  value: T extends StreamerbotVariableValue ? T : StreamerbotVariableValue;
+export type StreamerbotGlobalVariable<T extends StreamerbotVariableValue = StreamerbotVariableValue, K extends string = string> = {
+  name: K,
+  value: T,
   lastWrite: string;
 };
 
 export type StreamerbotUserGlobalVariable<
-  T = StreamerbotVariableValue,
-  K = string,
+  T extends StreamerbotVariableValue = StreamerbotVariableValue,
+  K extends string = string,
   U = string,
   P = StreamerbotPlatform
 > = StreamerbotGlobalVariable<T, K> & {
