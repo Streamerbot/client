@@ -638,25 +638,23 @@ export class StreamerbotClient {
   };
 
   /**
-   * Get Twitch emotes for the connected Streamer.bot instance
+   * Get emotes for the selected platform
    *
    * @version 0.2.5
    */
-  public async twitchGetEmotes(): Promise<TwitchGetEmotesResponse> {
-    return await this.request<TwitchGetEmotesResponse>({
-      request: 'TwitchGetEmotes',
-    });
-  }
-
-  /**
-   * Get YouTube emotes for the connected Streamer.bot instance
-   *
-   * @version 0.2.5
-   */
-  public async youtubeGetEmotes(): Promise<YouTubeGetEmotesResponse> {
-    return await this.request<YouTubeGetEmotesResponse>({
-      request: 'YouTubeGetEmotes',
-    });
+  public async getEmotes(platform: StreamerbotPlatform): Promise<TwitchGetEmotesResponse | YouTubeGetEmotesResponse> {
+    switch (platform) {
+      case 'twitch':
+        return await this.request<TwitchGetEmotesResponse>({
+          request: 'TwitchGetEmotes',
+        });
+      case 'youtube':
+        return await this.request<YouTubeGetEmotesResponse>({
+          request: 'YouTubeGetEmotes',
+        });
+      default:
+        throw new Error('Invalid platform');
+    }
   }
 
   /**
@@ -664,9 +662,10 @@ export class StreamerbotClient {
    *
    * @version 0.2.5
    */
-  public async getGlobals(): Promise<GetGlobalsResponse> {
+  public async getGlobals(persisted = true): Promise<GetGlobalsResponse> {
     return await this.request<GetGlobalsResponse>({
       request: 'GetGlobals',
+      persisted,
     });
   }
 
