@@ -1,5 +1,13 @@
 # @streamerbot/toolkit
 
+## 1.4.2
+
+### Patch Changes
+
+- Updated dependencies
+  - @streamerbot/client@1.7.0
+  - @streamerbot/vue@2.0.0
+
 ## 1.4.1
 
 ### Patch Changes

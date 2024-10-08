@@ -1,5 +1,11 @@
 # @streamerbot/client-docs
 
+## 1.7.0
+
+### Minor Changes
+
+- add global variable requests
+
 ## 1.6.0
 
 ### Minor Changes

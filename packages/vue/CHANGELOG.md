@@ -1,5 +1,16 @@
 # @streamerbot/vue
 
+## 1.7.0
+
+### Minor Changes
+
+- add global variable requests
+
+### Patch Changes
+
+- Updated dependencies
+  - @streamerbot/client@1.7.0
+
 ## 1.6.0
 
 ### Minor Changes
