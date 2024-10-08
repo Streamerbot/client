@@ -67,6 +67,7 @@ export class StreamerbotClient {
   private readonly options: StreamerbotClientOptions;
 
   protected socket?: WebSocket;
+  protected version?: string;
   protected listeners: Array<{
     events: StreamerbotEventName[];
     callback: (data: any) => void;
@@ -217,6 +218,7 @@ export class StreamerbotClient {
       const infoResponse = await this.getInfo();
       if (infoResponse.status !== 'ok') throw new Error('Failed to fetch Streamer.bot instance information');
 
+      this.version = infoResponse.info.version;
       this?.options?.onConnect?.(infoResponse.info);
     } catch (e) {
       console.error('Error invoking onOpen handler', e);
