@@ -10,7 +10,7 @@
     "publish-packages": "turbo run build lint && changeset version && changeset publish"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.8",
+    "@changesets/cli": "^2.27.9",
     "eslint": "^8.57.1",
     "prettier": "^3.3.3",
     "turbo": "^1.13.4"

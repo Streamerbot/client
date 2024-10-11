@@ -1,4 +1,5 @@
 export type StreamerbotRequestName =
+  | 'Authenticate'
   | 'Subscribe'
   | 'UnSubscribe'
   | 'GetEvents'
@@ -24,6 +25,7 @@ export type StreamerbotRequestName =
   | 'YouTubeGetUserGlobal'
   | 'TrovoGetUserGlobals'
   | 'TrovoGetUserGlobal'
+  | 'SendMessage'
 ;
 
 export type StreamerbotRequest = {

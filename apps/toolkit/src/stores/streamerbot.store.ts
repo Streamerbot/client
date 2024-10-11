@@ -11,10 +11,10 @@ export const useStreamerbotStore = defineStore('streamerbot', () => {
   const MAX_LOGS_LENGTH = 1000;
 
   // Configuration (LocalStorage)
-  const host = useStorage('sb:toolkit:host', DefaultStreamerbotClientOptions.host);
-  const port = useStorage('sb:toolkit:port', DefaultStreamerbotClientOptions.port);
-  const endpoint = useStorage('sb:toolkit:endpoint', DefaultStreamerbotClientOptions.endpoint);
-  const isNewConnection = useStorage('sb:toolkit:new', true);
+  const host = useStorage('sb:toolkit:host', () => DefaultStreamerbotClientOptions.host);
+  const port = useStorage('sb:toolkit:port', () => DefaultStreamerbotClientOptions.port);
+  const endpoint = useStorage('sb:toolkit:endpoint', () => DefaultStreamerbotClientOptions.endpoint);
+  const isNewConnection = useStorage('sb:toolkit:new', () => true);
 
   // Client Connection State
   const { client, error, status, connect, data } = useStreamerbot({

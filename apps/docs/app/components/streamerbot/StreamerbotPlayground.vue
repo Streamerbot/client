@@ -1,9 +1,14 @@
 <script setup lang="ts">
+import type { StreamerbotClientOptions } from '@streamerbot/client';
 import { useStreamerbot } from '@streamerbot/vue';
 
-const host = ref<string>('127.0.0.1');
-const port = ref<number>(8080);
-const endpoint = ref<string>('/');
+const state = ref<StreamerbotClientOptions>({
+  host: '127.0.0.1',
+  port: 8080,
+  endpoint: '/',
+  password: '',
+  immediate: false,
+});
 
 const {
   client,
@@ -12,29 +17,34 @@ const {
   error,
   connect,
   disconnect,
-} = useStreamerbot({
-  host,
-  port,
-  endpoint
-});
+} = useStreamerbot(state);
 
 // Disconnect on config change
-watch([host, port, endpoint], () => disconnect());
+watch(state, () => disconnect(), { deep: true });
 
-function reconnect() {
-  disconnect();
-  connect();
+async function reconnect() {
+  try {
+    await connect();
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 const clientOptionsCode = computed(() => {
   return `const client = new StreamerbotClient({
-  host: '${host.value}',
-  port: ${port.value},
-  endpoint: '${endpoint.value}'
+  host: '${state.value.host}',
+  port: ${state.value.port},
+  endpoint: '${state.value.endpoint}',
+  password: '${state.value.password.replace(/./g, '*')}',
 });`;
 });
 
 const lastRequestResponse = ref<any>();
+
+watch(client, (client) => {
+  if (!client) return;
+  client.on('Twitch.ChatMessage', (data) => console.log('Twitch.Chat', data));
+});
 </script>
 
 <template>
@@ -46,21 +56,29 @@ const lastRequestResponse = ref<any>();
         </h3>
       </template>
 
-      <div class="flex gap-1">
-        <UFormGroup label="Host">
-          <UInput v-model="host" placeholder="127.0.0.1" />
-        </UFormGroup>
-        <UFormGroup label="Port">
-          <UInput v-model.number="port" placeholder="8080" />
-        </UFormGroup>
-        <UFormGroup label="Endpoint">
-          <UInput v-model="endpoint" placeholder="/" />
-        </UFormGroup>
-      </div>
+      <UForm :state class="grid grid-rows-2 grid-cols-12 gap-3" @submit="() => reconnect()">
+        <div class="grid grid-cols-subgrid col-span-12 ">
+          <UFormGroup label="Host" class="col-span-6">
+            <UInput v-model="state.host" placeholder="127.0.0.1" />
+          </UFormGroup>
+          <UFormGroup label="Port" class="col-span-3">
+            <UInput v-model.number="state.port" placeholder="8080" />
+          </UFormGroup>
+          <UFormGroup label="Endpoint" class="col-span-3">
+            <UInput v-model="state.endpoint" placeholder="/" />
+          </UFormGroup>
+        </div>
+
+        <div class="col-span-full">
+          <UFormGroup label="Password" hint="Optional">
+            <UInput v-model="state.password" type="password" autocomplete="none" />
+          </UFormGroup>
+        </div>
+      </UForm>
 
       <template #footer>
         <div v-if="status === 'CLOSED'">
-          <UButton color="gray" block trailing-icon="i-mdi-wifi" @click="() => reconnect()">
+          <UButton color="gray" block trailing-icon="i-mdi-wifi" :loading="status === 'CONNECTING'" @click="() => reconnect()">
             Connect
           </UButton>
         </div>
@@ -112,6 +130,7 @@ const lastRequestResponse = ref<any>();
           <UButton color="gray" @click="async () => lastRequestResponse = await client.getUserGlobals('twitch', 'test')">Get Twitch User Globals (test)</UButton>
           <UButton color="gray" @click="async () => lastRequestResponse = await client.getUserGlobal('twitch', '54601714')">Get Twitch User Global</UButton>
           <UButton color="gray" @click="async () => lastRequestResponse = await client.getUserGlobal('twitch', '54601714', 'test')">Get Twitch User Global (test)</UButton>
+          <UButton color="gray" @click="async () => lastRequestResponse = await client.sendMessage('twitch', 'test', false, false)">Send Twitch Chat Message</UButton>
         </div>
         <div class="col-span-2 p-3 rounded-lg bg-gray-900 max-h-[600px] overflow-auto">
           <code class="whitespace-pre">{{ lastRequestResponse }}</code>

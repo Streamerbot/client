@@ -8,7 +8,6 @@
   "scripts": {
     "start": "node index.js"
   },
-  "devDependencies": {},
   "dependencies": {
     "@streamerbot/client": "^1.5.0"
   }

@@ -129,6 +129,8 @@ export type GetUserGlobalResponse<
   count: number;
 }>;
 
+export type SendMessageResponse = MaybeStreamerbotResponse<{}>;
+
 export type StreamerbotResponseTypes =
   | StreamerbotResponse<unknown>
   | SubscribeResponse

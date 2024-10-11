@@ -4,10 +4,10 @@ import {
   StreamerbotInfo,
   WebSocketStatus
 } from '@streamerbot/client';
-import { Ref, ref, unref } from 'vue-demi';
+import { Ref, ref, toValue, MaybeRef, isRef, computed, watch, onMounted, onBeforeUnmount } from 'vue-demi';
 
 export type MaybeRefs<T> = { [P in keyof T]: Ref<T[P]> | T[P] };
-export type UseStreamerbotOptions = MaybeRefs<StreamerbotClientOptions>;
+export type UseStreamerbotOptions = Partial<MaybeRefs<StreamerbotClientOptions>> | MaybeRef<Partial<MaybeRefs<StreamerbotClientOptions>>>;
 
 export type UseStreamerbotReturn = {
   data: Ref<any>;
@@ -18,7 +18,14 @@ export type UseStreamerbotReturn = {
   client: Ref<StreamerbotClient | undefined>;
 }
 
-export function useStreamerbot(options: Partial<UseStreamerbotOptions> = {}): UseStreamerbotReturn {
+export function useStreamerbot(options: UseStreamerbotOptions): UseStreamerbotReturn {
+  const _options = computed(() => isRef<Partial<MaybeRefs<StreamerbotClientOptions>>>(options) ? options.value : options);
+  const _optionsChanged = ref(false);
+  watch(options, () => {
+    _optionsChanged.value = true;
+    console.debug('Options changed...');
+  }, { deep: true });
+
   const data = ref();
   const status = ref<WebSocketStatus>('CLOSED');
   const error = ref<string>();
@@ -27,65 +34,85 @@ export function useStreamerbot(options: Partial<UseStreamerbotOptions> = {}): Us
   function onConnect(data: StreamerbotInfo) {
     status.value = 'OPEN';
     error.value = undefined;
-    let cb = unref(options.onConnect);
-    if (cb) cb(data);
+    let cb = toValue(_options.value.onConnect);
+    cb?.(data);
   }
 
   function onDisconnect() {
     status.value = 'CLOSED';
-    let cb = unref(options.onDisconnect);
-    if (cb) cb();
+    let cb = toValue(_options.value.onDisconnect);
+    cb?.();
   }
 
   function onError(err: Error) {
     error.value = err?.message ?? 'Unkown Error';
     status.value = 'CLOSED';
-    let cb = unref(options.onError);
-    if (cb) cb(err);
+    let cb = toValue(_options.value.onError);
+    cb?.(err);
   }
 
   function onData(payload: any) {
     data.value = payload;
-    let cb = unref(options.onData);
-    if (cb) cb(payload);
+    let cb = toValue(_options.value.onData);
+    cb?.(payload);
   }
 
   async function connect() {
     await disconnect();
-    _init(true);
+    status.value = 'CONNECTING';
+    if (_optionsChanged.value) {
+      await _init(true);
+    } else {
+      await clientRef.value?.connect();
+    }
   }
 
   async function disconnect() {
     if (!clientRef.value) return;
-    await clientRef.value.disconnect();
-    clientRef.value = undefined;
+    try {
+      clientRef.value.disconnect();
+    } catch (e) {
+      console.error(e);
+    }
+    status.value = 'CLOSED';
   }
 
   let _client: StreamerbotClient | undefined;
-  function _init(immediate: boolean = false) {
-    console.log('Initializing Streamer.bot Client...');
+  async function _init(immediate: boolean = false) {
+    if (clientRef.value) {
+      await disconnect();
+      clientRef.value = undefined;
+    }
+    console.debug('Initializing Streamer.bot Client...');
 
     if (immediate) status.value = 'CONNECTING';
 
     _client = new StreamerbotClient({
-      scheme: unref(options.scheme) ?? 'ws',
-      host: unref(options.host) ?? '127.0.0.1',
-      port: unref(options.port) ?? 8080,
-      endpoint: unref(options.endpoint) ?? '/',
-      immediate: (immediate || unref(options.immediate)) ?? true,
-      subscribe: unref(options.subscribe),
-      autoReconnect: unref(options.autoReconnect) ?? true,
-      retries: unref(options.retries) ?? -1,
+      scheme: toValue(_options.value.scheme) || 'ws',
+      host: toValue(_options.value.host) || '127.0.0.1',
+      port: toValue(_options.value.port) || 8080,
+      endpoint: toValue(_options.value.endpoint) || '/',
+      password: toValue(_options.value.password) || '',
+      immediate: immediate,
+      subscribe: toValue(_options.value.subscribe),
+      autoReconnect: toValue(_options.value.autoReconnect) ?? true,
+      retries: toValue(_options.value.retries) ?? -1,
       onConnect,
       onDisconnect,
       onError,
       onData
     });
     clientRef.value = _client;
+    _optionsChanged.value = false;
   }
 
-  if (unref(options.immediate))
-    connect();
+  onMounted(() => {
+    _init(toValue(_options.value.immediate));
+  });
+
+  onBeforeUnmount(() => {
+    disconnect();
+  });
 
   return {
     data,
