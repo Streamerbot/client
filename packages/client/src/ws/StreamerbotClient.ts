@@ -112,6 +112,10 @@ export class StreamerbotClient {
     this._connectController = new AbortController();
     const controller = new AbortController();
 
+    this._connectController.signal.addEventListener('abort', () => {
+      controller.abort();
+    }, { once: true });
+
     return await withTimeout(new Promise<void>(async (res, rej) => {
 
       try {
@@ -134,7 +138,7 @@ export class StreamerbotClient {
         this.socket.addEventListener('open', () => {
           if (!this.socket) return rej(new Error('WebSocket not initialized'));
           res();
-        }, { signal: AbortSignal.any([controller.signal, this._connectController.signal]) });
+        }, { signal: controller.signal });
 
         this.socket.addEventListener('close', () => {
           return rej(new Error('WebSocket closed'));
@@ -193,6 +197,10 @@ export class StreamerbotClient {
     const controller = new AbortController();
     const { signal } = controller;
 
+    this._connectController.signal.addEventListener('abort', () => {
+      controller.abort();
+    }, { once: true });
+
     const response = await withTimeout(
       new Promise<StreamerbotHelloRequest | StreamerbotInfo>((res, rej) => {
         this.socket?.addEventListener(
@@ -208,7 +216,7 @@ export class StreamerbotClient {
               res(payload);
             }
           },
-          { signal: AbortSignal.any([signal, this._connectController.signal]) }
+          { signal }
         );
       }),
       {
@@ -426,6 +434,10 @@ export class StreamerbotClient {
     const controller = new AbortController();
     const signal = controller.signal;
 
+    this._connectController.signal.addEventListener('abort', () => {
+      controller.abort();
+    }, { once: true });
+
     const response = await withTimeout(new Promise<T>((res, rej) => {
       this.socket?.addEventListener('message', (data: any) => {
         try {
@@ -436,13 +448,13 @@ export class StreamerbotClient {
         } catch (e) {
           rej(e);
         }
-      }, { signal: AbortSignal.any([signal, this._connectController.signal]) });
+      }, { signal});
       this.send({ ...request, id });
     }), {
       timeout,
       message: 'Request timed out',
       controller,
-      signal: AbortSignal.any([signal, this._connectController.signal]),
+      signal,
     });
 
     if (response?.status === 'ok') {
