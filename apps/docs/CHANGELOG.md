@@ -1,5 +1,11 @@
 # @streamerbot/client-docs
 
+## 1.8.0
+
+### Minor Changes
+
+- add support for authentication, Streamer.bot v0.2.5
+
 ## 1.7.0
 
 ### Minor Changes

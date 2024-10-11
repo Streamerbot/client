@@ -1,41 +1,13 @@
 # @streamerbot/toolkit
 
-## 1.4.2
-
-### Patch Changes
-
-- Updated dependencies
-  - @streamerbot/client@1.7.0
-  - @streamerbot/vue@2.0.0
-
-## 1.4.1
-
-### Patch Changes
-
-- Updated dependencies
-  - @streamerbot/client@1.6.0
-  - @streamerbot/vue@2.0.0
-
-## 1.2.0
+## 1.8.0
 
 ### Minor Changes
 
-- add payload types, general bug fixes
+- add support for authentication, Streamer.bot v0.2.5
 
 ### Patch Changes
 
 - Updated dependencies
-  - @streamerbot/client@1.4.0
-  - @streamerbot/vue@2.0.0
-
-## 1.1.0
-
-### Minor Changes
-
-- Add new Streamer.bot connection source field, bump deps.
-
-### Patch Changes
-
-- Updated dependencies
-  - @streamerbot/client@1.1.0
-  - @streamerbot/vue@1.1.0
+  - @streamerbot/client@1.8.0
+  - @streamerbot/vue@1.8.0
