@@ -1,5 +1,11 @@
 # @streamerbot/client
 
+## 1.8.1
+
+### Patch Changes
+
+- fix: remove AbortSignal.any()
+
 ## 1.8.0
 
 ### Minor Changes

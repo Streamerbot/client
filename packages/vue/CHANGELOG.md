@@ -1,5 +1,13 @@
 # @streamerbot/vue
 
+## 1.8.1
+
+### Patch Changes
+
+- fix: remove AbortSignal.any()
+- Updated dependencies
+  - @streamerbot/client@1.9.0
+
 ## 1.8.0
 
 ### Minor Changes
