@@ -75,8 +75,8 @@ export class StreamerbotClient {
   protected info?: StreamerbotInfo;
   protected version?: string;
 
-  private authEnabled: boolean = false;
-  private authenticated: boolean = false;
+  private _authEnabled: boolean = false;
+  private _authenticated: boolean = false;
 
   private listeners: Array<{
     events: Array<StreamerbotEventName | '*'>;
@@ -84,8 +84,8 @@ export class StreamerbotClient {
   }> = [];
   private subscriptions: StreamerbotEventsSubscription = {};
 
-  protected explicitlyClosed = false;
-  protected retried = 0;
+  private _explicitlyClosed = false;
+  private _retried = 0;
 
   private _connectController = new AbortController();
   private _reconnectTimeout: ReturnType<typeof setTimeout> | undefined = undefined;
@@ -94,19 +94,28 @@ export class StreamerbotClient {
     this.options = { ...DefaultStreamerbotClientOptions, ...options };
 
     if (true === this.options.immediate) {
-      this.connect();
+      this.connect().catch(e => console.warn);
     }
+  }
+
+  /**
+   * Check if the WebSocket connection is authenticated
+   */
+  public get authenticated(): boolean {
+    return this.socket?.readyState === this.socket?.OPEN && this._authenticated;
   }
 
   /**
    * Connect to a Streamer.bot WebSocket server
    */
   public async connect(timeout: number = 10_000): Promise<void> {
-    try {
-      await this.disconnect();
-    } catch (e) {}
+    if (this.socket?.readyState !== WebSocket.CLOSED) {
+      try {
+        await this.disconnect();
+      } catch (e) {}
+    }
 
-    this.explicitlyClosed = false;
+    this._explicitlyClosed = false;
 
     this._connectController.abort();
     this._connectController = new AbortController();
@@ -117,12 +126,11 @@ export class StreamerbotClient {
     }, { once: true });
 
     return await withTimeout(new Promise<void>(async (res, rej) => {
-
       try {
-        if (this.options.password) this.authEnabled = true;
+        if (this.options.password) this._authEnabled = true;
 
         const uri = `${this.options.scheme}://${this.options.host}:${this.options.port}${this.options.endpoint}`;
-        console.debug('Connecting to Streamer.bot WebSocket server at', uri, this.authEnabled ? 'with authentication' : '');
+        console.debug('Connecting to Streamer.bot WebSocket server at', uri, this._authEnabled ? 'with authentication' : '');
 
         if (globalThis.WebSocket) {
           this.socket = new WebSocket(uri);
@@ -163,12 +171,10 @@ export class StreamerbotClient {
    * Disconnect Streamer.bot WebSocket
    */
   public async disconnect(code: number = 1000, timeout: number = 1_000): Promise<void> {
+    this._explicitlyClosed = true;
     this._connectController.abort();
-    this.explicitlyClosed = true;
-
-    if (!this.socket || this.socket.readyState === this.socket.CLOSED || this.socket.readyState === this.socket.CLOSING) {
-      return;
-    }
+    this._reconnectTimeout && clearTimeout(this._reconnectTimeout);
+    if (!this.socket || this.socket.readyState === this.socket.CLOSED) return;
 
     const controller = new AbortController();
     const signal = controller.signal;
@@ -179,10 +185,12 @@ export class StreamerbotClient {
         res();
       }, { signal });
 
-      try {
-        this.socket?.close(code);
-      } catch (error) {
-        rej(error);
+      if (this.socket?.readyState !== this.socket?.CLOSING) {
+        try {
+          this.socket?.close(code);
+        } catch (error) {
+          rej(error);
+        }
       }
     }), {
       timeout,
@@ -266,7 +274,7 @@ export class StreamerbotClient {
     });
 
     if (response.status === 'ok') {
-      this.authenticated = true;
+      this._authenticated = true;
       this.version = data.info.version;
       this.info = data.info;
     } else {
@@ -276,10 +284,11 @@ export class StreamerbotClient {
   }
 
   protected async onOpen(): Promise<void> {
-    this.retried = 0;
+    this._retried = 0;
+    this._reconnectTimeout && clearTimeout(this._reconnectTimeout);
 
     try {
-      if (!this.authEnabled) {
+      if (!this._authEnabled) {
         void this.getInfo().catch(() => console.debug('Failed to get Streamer.bot info'));
       }
       await this.handshake();
@@ -322,27 +331,31 @@ export class StreamerbotClient {
       console.warn('Error invoking onDisconnect handler', e);
     }
 
-    if (!this.explicitlyClosed && this.options.autoReconnect) {
-      this.retried += 1;
-
-      if (
-        typeof this.options.retries === 'number' &&
-        (this.options.retries < 0 || this.retried < this.options.retries)
-      ) {
-        if (this._reconnectTimeout) clearTimeout(this._reconnectTimeout);
-        this._reconnectTimeout = setTimeout(async () => {
-          if (this.socket?.readyState !== WebSocket.CLOSED) return;
-          console.debug(`Reconnecting... (attempt ${this.retried})`);
-          try {
-            await this.connect(10_000);
-          } catch (e) {
-            console.warn(`Failed to reconnect (attempt ${this.retried-1})`, e);
-          }
-        }, Math.min(30_000, this.retried * 1_000));
-      }
-      else this.cleanup();
-    } else {
+    // No auto-reconnect, clean up
+    if (this._explicitlyClosed || !this.options.autoReconnect) {
       console.debug('Cleaning up...');
+      return this.cleanup();
+    }
+
+    // Handle auto-reconnect
+    this._retried += 1;
+    if (
+      typeof this.options.retries === 'number' &&
+      (this.options.retries < 0 || this._retried < this.options.retries)
+    ) {
+      if (this._reconnectTimeout) clearTimeout(this._reconnectTimeout);
+      this._reconnectTimeout = setTimeout(async () => {
+        if (this.socket?.readyState !== WebSocket.CLOSED) return;
+        console.debug(`Reconnecting... (attempt ${this._retried})`);
+        try {
+          await this.connect(10_000);
+        } catch (e) {
+          if (this._retried) console.warn(`Failed to reconnect (attempt ${this._retried - 1})`, e);
+        }
+      }, Math.min(30_000, this._retried * 1_000));
+    }
+    else {
+      console.debug('Auto-reconnect limit reached. Cleaning up...');
       this.cleanup();
     }
   }
@@ -408,7 +421,7 @@ export class StreamerbotClient {
       this.socket = undefined;
     }
     this.listeners = [];
-    this.retried = 0;
+    this._retried = 0;
     this._connectController.abort();
     if (this._reconnectTimeout) clearTimeout(this._reconnectTimeout);
   }
@@ -905,7 +918,7 @@ export class StreamerbotClient {
     bot = false,
     internal = true,
   ): Promise<SendMessageResponse> {
-    if (!this.authenticated) {
+    if (!this._authenticated) {
       return {
         status: 'error',
         error: 'Authentication required',

@@ -1,5 +1,11 @@
 # @streamerbot/client
 
+## 1.8.3
+
+### Patch Changes
+
+- fix: handle reconnect logic edge cases when re-initializing client with new options
+
 ## 1.8.1
 
 ### Patch Changes
