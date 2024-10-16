@@ -2,7 +2,7 @@
 import type { StreamerbotClientOptions } from '@streamerbot/client';
 import { useStreamerbot } from '@streamerbot/vue';
 
-const state = ref<StreamerbotClientOptions>({
+const state = ref<Partial<StreamerbotClientOptions>>({
   host: '127.0.0.1',
   port: 8080,
   endpoint: '/',
@@ -24,6 +24,7 @@ watch(state, () => disconnect(), { deep: true });
 
 async function reconnect() {
   try {
+    await disconnect();
     await connect();
   } catch (e) {
     console.error(e);
@@ -77,7 +78,7 @@ watch(client, (client) => {
       </UForm>
 
       <template #footer>
-        <div v-if="status === 'CLOSED'">
+        <div v-if="status !== 'OPEN'">
           <UButton color="gray" block trailing-icon="i-mdi-wifi" :loading="status === 'CONNECTING'" @click="() => reconnect()">
             Connect
           </UButton>
