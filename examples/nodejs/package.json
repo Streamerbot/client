@@ -1,6 +1,6 @@
 {
   "name": "@streamerbot/node-client-demo",
-  "version": "1.8.0",
+  "version": "1.8.3",
   "description": "",
   "private": true,
   "main": "index.js",
@@ -9,6 +9,6 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "@streamerbot/client": "^1.8.0"
+    "@streamerbot/client": "^1.8.3"
   }
 }
