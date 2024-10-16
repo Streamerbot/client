@@ -1,5 +1,11 @@
 # @streamerbot/vue
 
+## 1.8.3
+
+### Patch Changes
+
+- add useGlobalVariable composable, StreamerbotGlobalVariable component
+
 ## 1.8.1
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @streamerbot/toolkit
 
+## 1.8.3
+
+### Patch Changes
+
+- Updated dependencies
+  - @streamerbot/vue@1.8.3
+
 ## 1.8.1
 
 ### Patch Changes
