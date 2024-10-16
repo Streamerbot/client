@@ -1,6 +1,6 @@
 {
   "name": "@streamerbot/vue",
-  "version": "1.8.2",
+  "version": "1.8.3",
   "description": "Streamer.bot Vue Composition Utilities",
   "author": "Whipstickgostop <https://github.com/whiptsickgostop>",
   "license": "MIT",
@@ -17,13 +17,21 @@
   "type": "module",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "require": "./dist/index.js"
+    },
+    "./components": {
+      "types": "./dist/components/index.d.ts",
+      "import": "./dist/components/index.mjs",
+      "require": "./dist/components/index.js"
     }
   },
-  "main": "./dist/index.cjs",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "files": [
+    "components.d.ts",
     "dist"
   ],
   "scripts": {
@@ -34,6 +42,7 @@
   },
   "devDependencies": {
     "@streamerbot/client": "workspace:^",
+    "mkdist": "^1.6.0",
     "typescript": "^5.6.3",
     "unbuild": "^2.0.0"
   },
@@ -41,6 +50,6 @@
     "vue-demi": "^0.14.10"
   },
   "peerDependencies": {
-    "@streamerbot/client": "^1.8.2"
+    "@streamerbot/client": "^1.8.3"
   }
 }
