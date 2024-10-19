@@ -1,5 +1,13 @@
 # @streamerbot/vue
 
+## 1.9.1
+
+### Patch Changes
+
+- fix: properly pass modified req object to sendMessage
+- Updated dependencies
+  - @streamerbot/client@1.9.1
+
 ## 1.9.0
 
 ### Minor Changes

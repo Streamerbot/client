@@ -1,5 +1,11 @@
 # @streamerbot/client
 
+## 1.9.1
+
+### Patch Changes
+
+- fix: properly pass modified req object to sendMessage
+
 ## 1.9.0
 
 ### Minor Changes
