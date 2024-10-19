@@ -14,6 +14,7 @@ import {
 } from './streamerbot-event.types';
 import { StreamerbotGlobalVariable, StreamerbotGlobalVariableName, StreamerbotUserGlobalVariable, StreamerbotVariableValue } from './streamerbot-global.types';
 import { StreamerbotInfo } from './streamerbot-info.types';
+import { StreamerbotUserPronouns } from './streamerbot-pronouns.types';
 import { StreamerbotViewer } from './streamerbot-viewer.types.ts';
 import { Prettify } from './util.types';
 
@@ -131,6 +132,11 @@ export type GetUserGlobalResponse<
 
 export type SendMessageResponse = MaybeStreamerbotResponse<{}>;
 
+export type GetUserPronounsResponse = MaybeStreamerbotResponse<{
+  userLogin: string;
+  pronoun: StreamerbotUserPronouns,
+}>
+
 export type StreamerbotResponseTypes =
   | StreamerbotResponse<unknown>
   | SubscribeResponse
@@ -149,4 +155,10 @@ export type StreamerbotResponseTypes =
   | GetCodeTriggersResponse
   | GetCommandsResponse
   | TwitchGetEmotesResponse
-  | YouTubeGetEmotesResponse;
+  | YouTubeGetEmotesResponse
+  | GetGlobalsResponse
+  | GetGlobalResponse<StreamerbotVariableValue>
+  | GetUserGlobalsResponse
+  | GetUserGlobalResponse
+  | SendMessageResponse
+  | GetUserPronounsResponse;

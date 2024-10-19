@@ -131,7 +131,8 @@ watch(client, (client) => {
           <UButton color="gray" @click="async () => lastRequestResponse = await client.getUserGlobals('twitch', 'test')">Get Twitch User Globals (test)</UButton>
           <UButton color="gray" @click="async () => lastRequestResponse = await client.getUserGlobal('twitch', '54601714')">Get Twitch User Global</UButton>
           <UButton color="gray" @click="async () => lastRequestResponse = await client.getUserGlobal('twitch', '54601714', 'test')">Get Twitch User Global (test)</UButton>
-          <UButton color="gray" @click="async () => lastRequestResponse = await client.sendMessage('twitch', 'test', false, false)">Send Twitch Chat Message</UButton>
+          <UButton color="gray" @click="async () => lastRequestResponse = await client.sendMessage('twitch', 'test', { bot: false, internal: false })">Send Twitch Chat Message</UButton>
+          <UButton color="gray" @click="async () => lastRequestResponse = await client.getUserPronouns('twitch', 'whipstickgostop')">Get User Pronouns</UButton>
         </div>
         <div class="col-span-2 p-3 rounded-lg bg-gray-900 max-h-[600px] overflow-auto">
           <code class="whitespace-pre">{{ lastRequestResponse }}</code>

@@ -27,6 +27,7 @@ import {
   GetMonitoredYouTubeBroadcastsResponse,
   GetUserGlobalResponse,
   GetUserGlobalsResponse,
+  GetUserPronounsResponse,
   SendMessageResponse,
   StreamerbotErrorResponse,
   StreamerbotResponseTypes,
@@ -67,6 +68,48 @@ export const DefaultStreamerbotClientOptions: StreamerbotClientOptions = {
   subscribe: {},
 } as const;
 
+/**
+ * The `StreamerbotClient` class provides an interface to connect and interact with a Streamer.bot WebSocket server.
+ * It allows for authentication, event subscription, and various requests to control and retrieve information from the Streamer.bot instance.
+ *
+ * @example
+ * ```typescript
+ * const client = new StreamerbotClient({
+ *   host: 'localhost',
+ *   port: 8080,
+ *   password: 'your_password',
+ *   immediate: true,
+ *   autoReconnect: true,
+ *   retries: 5,
+ *   onConnect: (info) => console.log('Connected to Streamer.bot', info),
+ *   onError: (error) => console.error('Error:', error),
+ * });
+ *
+ * client.on('Twitch.ChatMessage', (data) => {
+ *   console.log('Chat message received:', data);
+ * });
+ * ```
+ *
+ * @remarks
+ * The client supports both browser and Node.js environments. In a Node.js environment, it uses the `ws` package for WebSocket connections.
+ *
+ * @param options - Configuration options for the StreamerbotClient instance.
+ * @param options.host - The host of the Streamer.bot WebSocket server.
+ * @param options.port - The port of the Streamer.bot WebSocket server.
+ * @param options.password - The password for authentication with the Streamer.bot WebSocket server.
+ * @param options.scheme - The scheme to use for the WebSocket connection (e.g., 'ws' or 'wss').
+ * @param options.endpoint - The endpoint path for the WebSocket connection.
+ * @param options.immediate - Whether to immediately connect to the WebSocket server upon instantiation.
+ * @param options.autoReconnect - Whether to automatically reconnect to the WebSocket server if the connection is lost.
+ * @param options.retries - The number of reconnection attempts before giving up. A negative value means infinite retries.
+ * @param options.subscribe - Initial subscriptions to events upon connection.
+ * @param options.onConnect - Callback function to be called when the client successfully connects to the WebSocket server.
+ * @param options.onDisconnect - Callback function to be called when the client disconnects from the WebSocket server.
+ * @param options.onError - Callback function to be called when an error occurs.
+ * @param options.onData - Callback function to be called when data is received from the WebSocket server.
+ *
+ * @public
+ */
 export class StreamerbotClient {
   private readonly options: StreamerbotClientOptions;
 
@@ -909,14 +952,17 @@ export class StreamerbotClient {
    * @version 0.2.5
    * @param platform The platform to send the message to
    * @param message The message content to send
-   * @param bot Whether the message should be sent as the bot account (Default: false)
-   * @param internal Whether the message should be marked as internal (Default: true)
+   * @param options Additional options for the message
    */
   public async sendMessage(
     platform: StreamerbotPlatform,
     message: string,
-    bot = false,
-    internal = true,
+    { bot = false, internal = true, replyId, broadcastId }: {
+      bot: boolean;
+      internal: boolean;
+      replyId: string | undefined;
+      broadcastId: string | undefined;
+    }
   ): Promise<SendMessageResponse> {
     if (!this._authenticated) {
       return {
@@ -925,12 +971,42 @@ export class StreamerbotClient {
       } as StreamerbotErrorResponse;
     }
 
+    const request = {
+      request: 'SendMessage',
+      platform,
+      message,
+      bot,
+      internal,
+    };
+
+    if (platform === 'twitch' && replyId) Object.assign(request, { replyId });
+    if (platform === 'youtube' && broadcastId) Object.assign(request, { broadcastId });
+
     return await this.request({
       request: 'SendMessage',
       platform,
       message,
       bot,
       internal,
+    });
+  }
+
+
+  /**
+   * Retrieves the pronouns of a user from the specified platform.
+   *
+   * @param platform - The platform from which to retrieve the user's pronouns.
+   * @param userLogin - The login name of the user whose pronouns are to be retrieved.
+   * @returns A promise that resolves to the user's pronouns.
+   */
+  public async getUserPronouns(
+    platform: StreamerbotPlatform,
+    userLogin: string,
+  ): Promise<GetUserPronounsResponse> {
+    return await this.request<GetUserPronounsResponse>({
+      request: 'GetUserPronouns',
+      platform,
+      userLogin,
     });
   }
 }

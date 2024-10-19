@@ -26,6 +26,7 @@ export type StreamerbotRequestName =
   | 'TrovoGetUserGlobals'
   | 'TrovoGetUserGlobal'
   | 'SendMessage'
+  | 'GetUserPronouns'
 ;
 
 export type StreamerbotRequest = {

@@ -1,0 +1,20 @@
+export type StreamerbotUserPronouns = {
+  pronouns: string;
+  pronounSubject: string;
+  pronounObject: string;
+  pronounPossessive: string;
+  pronounPronoun: string;
+  pronounReflexive: string;
+  pronounPastTense: string;
+  pronounSubjectLower: string;
+  pronounObjectLower: string;
+  pronounPossessiveLower: string;
+  pronounPronounLower: string;
+  pronounReflexiveLower: string;
+  pronounPastTenseLower: string;
+  pronounCurrentTense: string;
+  pronounCurrentTenseLower: string;
+  pronounPluralLower: string;
+  pronounLastCached: string;
+  userFound: boolean;
+};
