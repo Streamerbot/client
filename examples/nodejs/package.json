@@ -9,6 +9,6 @@
     "start": "node index.js"
   },
   "dependencies": {
-    "@streamerbot/client": "^1.9.0"
+    "@streamerbot/client": "^1.9.1"
   }
 }
