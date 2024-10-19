@@ -957,12 +957,12 @@ export class StreamerbotClient {
   public async sendMessage(
     platform: StreamerbotPlatform,
     message: string,
-    { bot = false, internal = true, replyId, broadcastId }: {
-      bot: boolean;
-      internal: boolean;
-      replyId: string | undefined;
-      broadcastId: string | undefined;
-    }
+    { bot = false, internal = true, ...options }: {
+      bot?: boolean;
+      internal?: boolean;
+      replyId?: string;
+      broadcastId?: string;
+    } = {}
   ): Promise<SendMessageResponse> {
     if (!this._authenticated) {
       return {
@@ -971,23 +971,19 @@ export class StreamerbotClient {
       } as StreamerbotErrorResponse;
     }
 
-    const request = {
-      request: 'SendMessage',
+    const req = {
       platform,
       message,
       bot,
       internal,
     };
 
-    if (platform === 'twitch' && replyId) Object.assign(request, { replyId });
-    if (platform === 'youtube' && broadcastId) Object.assign(request, { broadcastId });
+    if (platform === 'twitch' && options.replyId) Object.assign(req, { replyId: options.replyId });
+    if (platform === 'youtube' && options.broadcastId) Object.assign(req, { broadcastId: options.broadcastId });
 
     return await this.request({
+      ...req,
       request: 'SendMessage',
-      platform,
-      message,
-      bot,
-      internal,
     });
   }
 
