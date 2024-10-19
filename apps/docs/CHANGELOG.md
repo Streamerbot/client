@@ -1,5 +1,11 @@
 # @streamerbot/client-docs
 
+## 1.9.0
+
+### Minor Changes
+
+- add support for getUserPronouns, twitch replies, and specific youtube broadcast'
+
 ## 1.8.0
 
 ### Minor Changes
@@ -18,22 +24,11 @@
 
 - Streamer.bot v0.2.5 updates
 
-## 1.4.1
-
-### Patch Changes
-
-- @streamerbot/vue@2.0.0
-
 ## 1.3.0
 
 ### Minor Changes
 
 - add payload types, general bug fixes
-
-### Patch Changes
-
-- Updated dependencies
-  - @streamerbot/vue@2.0.0
 
 ## 1.2.0
 

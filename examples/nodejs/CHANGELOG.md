@@ -1,4 +1,4 @@
-# @streamerbot/vue-ts
+# @streamerbot/node-client-demo
 
 ## 1.9.0
 
@@ -9,11 +9,4 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @streamerbot/vue@1.9.0
-
-## 1.8.3
-
-### Patch Changes
-
-- Updated dependencies
-  - @streamerbot/vue@1.8.3
+  - @streamerbot/client@1.9.0
