@@ -145,14 +145,14 @@ export class StreamerbotClient {
    * Check if the WebSocket connection is authenticated
    */
   public get authenticated(): boolean {
-    return this.socket?.readyState === this.socket?.OPEN && this._authenticated;
+    return !!this.socket && this.socket.readyState === this.socket.OPEN && this._authenticated;
   }
 
   /**
    * Connect to a Streamer.bot WebSocket server
    */
   public async connect(timeout: number = 10_000): Promise<void> {
-    if (this.socket?.readyState !== WebSocket.CLOSED) {
+    if (this.socket?.readyState !== this.socket?.CLOSED) {
       try {
         await this.disconnect();
       } catch (e) {}
@@ -262,9 +262,13 @@ export class StreamerbotClient {
               return rej(new Error('Unknown message received'));
             }
 
-            const payload = JSON.parse(event.data);
-            if (payload && 'info' in payload) {
-              res(payload);
+            try {
+              const payload = JSON.parse(event.data);
+              if (payload && 'info' in payload) {
+                res(payload);
+              }
+            } catch (e) {
+              rej(e);
             }
           },
           { signal }
@@ -388,7 +392,7 @@ export class StreamerbotClient {
     ) {
       if (this._reconnectTimeout) clearTimeout(this._reconnectTimeout);
       this._reconnectTimeout = setTimeout(async () => {
-        if (this.socket?.readyState !== WebSocket.CLOSED) return;
+        if (!!this.socket && this.socket.readyState !== this.socket.CLOSED) return;
         console.debug(`Reconnecting... (attempt ${this._retried})`);
         try {
           await this.connect(10_000);
@@ -409,7 +413,13 @@ export class StreamerbotClient {
       return;
     }
 
-    const payload = JSON.parse(data.data);
+    let payload;
+    try {
+      payload = JSON.parse(data.data);
+    } catch (e) {
+      console.warn('Invalid JSON payload received', data.data);
+      return;
+    }
 
     // onData handler
     try {
@@ -445,7 +455,7 @@ export class StreamerbotClient {
 
   protected onError(event: Event): void {
     console.debug('WebSocket onError', event);
-    if (this.socket && this.socket.readyState !== this.socket.OPEN) {
+    if (!!this.socket && this.socket.readyState !== this.socket.OPEN) {
       this._connectController.abort();
     }
     try {
@@ -504,7 +514,7 @@ export class StreamerbotClient {
         } catch (e) {
           rej(e);
         }
-      }, { signal});
+      }, { signal });
       this.send({ ...request, id });
     }), {
       timeout,
@@ -583,7 +593,7 @@ export class StreamerbotClient {
       }
 
       // If WebSocket is connected, subscribe to the event(s)
-      if (this.socket?.readyState === WebSocket.OPEN && this.version) {
+      if (this.socket && this.socket.readyState === this.socket.OPEN && this.version) {
         await this.subscribe(this.subscriptions);
       }
 
