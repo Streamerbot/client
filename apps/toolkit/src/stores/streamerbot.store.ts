@@ -16,15 +16,17 @@ export const useStreamerbotStore = defineStore('streamerbot', () => {
   const endpoint = useStorage('sb:toolkit:endpoint', () => DefaultStreamerbotClientOptions.endpoint);
   const isNewConnection = useStorage('sb:toolkit:new', () => true);
 
-  // Client Connection State
-  const { client, error, status, connect, data } = useStreamerbot({
-    host,
-    port,
-    endpoint,
+  const settings = computed(() => ({
+    host: host.value,
+    port: port.value,
+    endpoint: endpoint.value,
     immediate: !isNewConnection.value,
-    subscribe: '*',
+    subscribe: '*' as any,
     onConnect,
-  });
+  }))
+
+  // Client Connection State
+  const { client, error, status, connect, data } = useStreamerbot(settings);
   const isConnected = computed(() => status.value === 'OPEN');
   const isConnecting = computed(() => status.value === 'CONNECTING');
 
