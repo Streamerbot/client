@@ -259,7 +259,7 @@ export class StreamerbotClient {
           async (event) => {
             if (!event.data || typeof event.data !== 'string') {
               console.debug('Unknown message received', event);
-              return rej(new Error('Unknown message received'));
+              return;
             }
 
             try {
