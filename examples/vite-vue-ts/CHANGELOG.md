@@ -1,5 +1,13 @@
 # @streamerbot/vue-ts
 
+## 1.9.2
+
+### Patch Changes
+
+- NodeJS fixes
+- Updated dependencies
+  - @streamerbot/vue@1.9.2
+
 ## 1.9.0
 
 ### Minor Changes

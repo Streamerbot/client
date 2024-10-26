@@ -1,5 +1,14 @@
 # @streamerbot/toolkit
 
+## 1.9.2
+
+### Patch Changes
+
+- NodeJS fixes
+- Updated dependencies
+  - @streamerbot/client@1.9.2
+  - @streamerbot/vue@1.9.2
+
 ## 1.9.1
 
 ### Patch Changes
