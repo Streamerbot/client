@@ -1,5 +1,11 @@
 # @streamerbot/client-docs
 
+## 1.9.4
+
+### Patch Changes
+
+- fix for NodeJS environments
+
 ## 1.9.3
 
 ### Patch Changes

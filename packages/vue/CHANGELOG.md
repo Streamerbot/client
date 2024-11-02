@@ -1,5 +1,13 @@
 # @streamerbot/vue
 
+## 1.9.4
+
+### Patch Changes
+
+- fix for NodeJS environments
+- Updated dependencies
+  - @streamerbot/client@1.9.4
+
 ## 1.9.3
 
 ### Patch Changes
