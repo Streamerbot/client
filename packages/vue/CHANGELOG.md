@@ -1,5 +1,13 @@
 # @streamerbot/vue
 
+## 1.9.5
+
+### Patch Changes
+
+- handle partial WebSocket server auth (enforce for all requests = false)
+- Updated dependencies
+  - @streamerbot/client@1.9.5
+
 ## 1.9.4
 
 ### Patch Changes
