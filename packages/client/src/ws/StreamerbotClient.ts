@@ -175,11 +175,7 @@ export class StreamerbotClient {
         const uri = `${this.options.scheme}://${this.options.host}:${this.options.port}${this.options.endpoint}`;
         console.debug('Connecting to Streamer.bot WebSocket server at', uri, this._authEnabled ? 'with authentication' : '');
 
-        if (globalThis.WebSocket) {
-          this.socket = new WebSocket(uri);
-        } else {
-          this.socket = new (await import('ws')).WebSocket(uri);
-        }
+        this.socket = !!globalThis?.process?.versions?.node ? new (await import('ws')).WebSocket(uri) : new WebSocket(uri);
 
         this.socket.onmessage = this.onMessage.bind(this);
         this.socket.onopen = this.onOpen.bind(this);
@@ -254,25 +250,22 @@ export class StreamerbotClient {
 
     const response = await withTimeout(
       new Promise<StreamerbotHelloRequest | StreamerbotInfo>((res, rej) => {
-        this.socket?.addEventListener(
-          'message',
-          async (event) => {
-            if (!event.data || typeof event.data !== 'string') {
-              console.debug('Unknown message received', event);
-              return;
-            }
+        this.socket?.addEventListener('message', async (event) => {
+          if (!('data' in event) || !event.data || typeof event.data !== 'string') {
+            console.debug('Unknown message received', event);
+            return;
+          }
 
-            try {
-              const payload = JSON.parse(event.data);
-              if (payload && 'info' in payload) {
-                res(payload);
-              }
-            } catch (e) {
-              rej(e);
+          try {
+            const payload = JSON.parse(event.data);
+            if (payload && 'info' in payload) {
+              res(payload);
             }
-          },
-          { signal }
-        );
+          } catch (e) {
+            console.warn('Invalid JSON payload received', event.data);
+            rej(e);
+          }
+        }, { signal });
       }),
       {
         timeout: 5_000,
@@ -407,17 +400,17 @@ export class StreamerbotClient {
     }
   }
 
-  protected async onMessage(data: MessageEvent): Promise<void> {
-    if (!data.data || typeof data.data !== 'string') {
-      console.debug('Unknown message received', data);
+  protected async onMessage(event: MessageEvent): Promise<void> {
+    if (!event.data || typeof event.data !== 'string') {
+      console.debug('Unknown message received', event);
       return;
     }
 
     let payload;
     try {
-      payload = JSON.parse(data.data);
+      payload = JSON.parse(event.data);
     } catch (e) {
-      console.warn('Invalid JSON payload received', data.data);
+      console.warn('Invalid JSON payload received', event.data);
       return;
     }
 
@@ -505,13 +498,19 @@ export class StreamerbotClient {
     }, { once: true });
 
     const response = await withTimeout(new Promise<T>((res, rej) => {
-      this.socket?.addEventListener('message', (data: any) => {
+      this.socket?.addEventListener('message', (event) => {
+        if (!('data' in event) || !event.data || typeof event.data !== 'string') {
+          console.debug('Unknown message received', event.data);
+          return;
+        }
+
         try {
-          const payload = JSON.parse(data?.data);
+          const payload = JSON.parse(event?.data);
           if (payload?.id === id) {
             return res(payload);
           }
         } catch (e) {
+          console.warn('Invalid JSON payload received', event.data);
           rej(e);
         }
       }, { signal });

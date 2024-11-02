@@ -41,7 +41,7 @@ export function getCloseEventReason(event: CloseEvent) {
  */
 export async function withTimeout<T>(
   promise: Promise<T>,
-  options: { timeout?: number; message?: string; controller?: AbortController; signal?: AbortSignal } = {},
+  options: { timeout: number; message?: string; controller: AbortController; signal?: AbortSignal },
 ): Promise<void | Awaited<T>> {
   const {
     timeout,
@@ -52,7 +52,7 @@ export async function withTimeout<T>(
   return await Promise.race([
     new Promise<void>((_, rej) => {
       timeoutId = setTimeout(() => {
-        controller?.abort();
+        controller.abort();
         console.debug('[withTimeout] timeout reached', options);
         return rej(new Error(message));
       }, timeout);
@@ -66,7 +66,7 @@ export async function withTimeout<T>(
     promise,
   ]).finally(() => {
     clearTimeout(timeoutId);
-    controller?.abort();
+    controller.abort();
   });
 }
 

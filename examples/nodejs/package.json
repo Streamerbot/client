@@ -3,12 +3,13 @@
   "version": "1.9.3",
   "description": "",
   "private": true,
-  "main": "index.js",
+  "module": "index.js",
   "type": "module",
   "scripts": {
+    "dev": "DEBUG=* node --watch index.js",
     "start": "node index.js"
   },
   "dependencies": {
-    "@streamerbot/client": "^1.9.3"
+    "@streamerbot/client": "workspace:*"
   }
 }
