@@ -1,5 +1,14 @@
 # @streamerbot/toolkit
 
+## 1.9.3
+
+### Patch Changes
+
+- fix handshake failure on unknown message received in NodeJS environments
+- Updated dependencies
+  - @streamerbot/client@1.9.3
+  - @streamerbot/vue@1.9.3
+
 ## 1.9.2
 
 ### Patch Changes
