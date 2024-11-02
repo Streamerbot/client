@@ -290,8 +290,15 @@ export class StreamerbotClient {
   }
 
   private async authenticate(data: StreamerbotHelloRequest): Promise<void> {
-    if (!this.options.password) {
-      console.debug('No password provided for authentication');
+    if (!this._authEnabled || !this.options.password) {
+      console.debug('No password provided for authentication. Checking if auth is enforced for all requests...');
+      const res = await this.getInfo();
+      if (res.status === 'ok') {
+        this._authenticated = false;
+        this.version = data.info.version;
+        this.info = data.info;
+        return;
+      }
       await this.disconnect();
       throw new Error('Authentication required');
     }
@@ -328,6 +335,7 @@ export class StreamerbotClient {
     this._reconnectTimeout && clearTimeout(this._reconnectTimeout);
 
     try {
+      // Force a getInfo call for backwards compat with Streamer.bot v0.2.4 and older
       if (!this._authEnabled) {
         void this.getInfo().catch(() => console.debug('Failed to get Streamer.bot info'));
       }
