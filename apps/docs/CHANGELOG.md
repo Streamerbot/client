@@ -1,5 +1,11 @@
 # @streamerbot/client-docs
 
+## 1.10.0
+
+### Minor Changes
+
+- Add custom event response helpers, fix straggling event listner bug
+
 ## 1.9.5
 
 ### Patch Changes

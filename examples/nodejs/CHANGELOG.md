@@ -1,5 +1,16 @@
 # @streamerbot/node-client-demo
 
+## 1.10.0
+
+### Minor Changes
+
+- Add custom event response helpers, fix straggling event listner bug
+
+### Patch Changes
+
+- Updated dependencies
+  - @streamerbot/client@1.10.0
+
 ## 1.9.5
 
 ### Patch Changes

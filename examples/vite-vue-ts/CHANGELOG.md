@@ -1,5 +1,16 @@
 # @streamerbot/vue-ts
 
+## 1.10.0
+
+### Minor Changes
+
+- Add custom event response helpers, fix straggling event listner bug
+
+### Patch Changes
+
+- Updated dependencies
+  - @streamerbot/vue@2.0.0
+
 ## 1.9.5
 
 ### Patch Changes
