@@ -1,4 +1,5 @@
 import type { WebSocket as WebSocketNode } from 'ws';
+import { defaultLogger, Logger, LogLevel } from '../utils/logger';
 import { StreamerbotAction, StreamerbotInfo, StreamerbotPlatform, StreamerbotVariableValue } from './types';
 import { StreamerbotEvents } from './types/events';
 import { StreamerbotHelloRequest } from './types/streamerbot-auth.types';
@@ -55,6 +56,8 @@ export type StreamerbotClientOptions = {
   onDisconnect?: () => void;
   onError?: (error: Error) => void;
   onData?: (data: any) => void;
+  logger?: Logger | null;
+  logLevel?: LogLevel;
 };
 
 export const DefaultStreamerbotClientOptions: StreamerbotClientOptions = {
@@ -66,6 +69,8 @@ export const DefaultStreamerbotClientOptions: StreamerbotClientOptions = {
   autoReconnect: true,
   retries: -1,
   subscribe: {},
+  logger: defaultLogger,
+  logLevel: 'info',
 } as const;
 
 /**
@@ -112,6 +117,7 @@ export const DefaultStreamerbotClientOptions: StreamerbotClientOptions = {
  */
 export class StreamerbotClient {
   private readonly options: StreamerbotClientOptions;
+  private logger: Logger | null;
 
   protected socket?: WebSocket | WebSocketNode;
 
@@ -136,8 +142,14 @@ export class StreamerbotClient {
   public constructor(options: Partial<StreamerbotClientOptions> = DefaultStreamerbotClientOptions) {
     this.options = { ...DefaultStreamerbotClientOptions, ...options };
 
+    // Configure logger
+    this.logger = this.options.logger || null;
+    if (this.logger && this.options.logLevel) {
+      this.logger.setLevel(this.options.logLevel);
+    }
+
     if (true === this.options.immediate) {
-      this.connect().catch(e => console.warn);
+      this.connect().catch(e => this.logger?.warn('Failed to connect:', e));
     }
   }
 
@@ -173,7 +185,7 @@ export class StreamerbotClient {
         if (this.options.password) this._authEnabled = true;
 
         const uri = `${this.options.scheme}://${this.options.host}:${this.options.port}${this.options.endpoint}`;
-        console.debug('Connecting to Streamer.bot WebSocket server at', uri, this._authEnabled ? 'with authentication' : '');
+        this.logger?.debug('Connecting to Streamer.bot WebSocket server at', uri, this._authEnabled ? 'with authentication' : '');
 
         this.socket = !!globalThis?.process?.versions?.node ? new (await import('ws')).WebSocket(uri) : new WebSocket(uri);
 
@@ -195,7 +207,7 @@ export class StreamerbotClient {
           await this.disconnect();
           this?.options?.onError?.(error as Error);
         } catch (e) {
-          console.warn('Error invoking onError handler', e);
+          this.logger?.warn('Error invoking onError handler', e);
         }
         rej(error);
       }
@@ -220,7 +232,7 @@ export class StreamerbotClient {
 
     return await withTimeout(new Promise<void>((res, rej) => {
       this.socket?.addEventListener('close', () => {
-        console.debug('Disconnected from Streamer.bot WebSocket server');
+        this.logger?.debug('Disconnected from Streamer.bot WebSocket server');
         res();
       }, { signal });
 
@@ -252,7 +264,7 @@ export class StreamerbotClient {
       new Promise<StreamerbotHelloRequest | StreamerbotInfo>((res, rej) => {
         this.socket?.addEventListener('message', async (event) => {
           if (!('data' in event) || !event.data || typeof event.data !== 'string') {
-            console.debug('Unknown message received', event);
+            this.logger?.debug('Unknown message received', event);
             return;
           }
 
@@ -262,7 +274,7 @@ export class StreamerbotClient {
               res(payload);
             }
           } catch (e) {
-            console.warn('Invalid JSON payload received', event.data);
+            this.logger?.warn('Invalid JSON payload received', event.data);
             rej(e);
           }
         }, { signal });
@@ -280,7 +292,7 @@ export class StreamerbotClient {
       return await this.authenticate(response as StreamerbotHelloRequest);
     }
     else if (response.info && !response.authentication) {
-      console.debug('Connected to Streamer.bot WebSocket server', response.info);
+      this.logger?.debug('Connected to Streamer.bot WebSocket server', response.info);
       this.info = response.info;
       this.version = response.info.version;
       return;
@@ -291,7 +303,7 @@ export class StreamerbotClient {
 
   private async authenticate(data: StreamerbotHelloRequest): Promise<void> {
     if (!this._authEnabled || !this.options.password) {
-      console.debug('No password provided for authentication. Checking if auth is enforced for all requests...');
+      this.logger?.debug('No password provided for authentication. Checking if auth is enforced for all requests...');
       const res = await this.getInfo();
       if (res.status === 'ok') {
         this._authenticated = false;
@@ -304,12 +316,12 @@ export class StreamerbotClient {
     }
 
     if (!data.authentication) {
-      console.debug('Missing authentication payload');
+      this.logger?.debug('Missing authentication payload');
       await this.disconnect();
       throw new Error('Invalid authentication payload');
     }
 
-    console.debug('Authenticating with Streamer.bot WebSocket server...');
+    this.logger?.debug('Authenticating with Streamer.bot WebSocket server...');
 
     const { salt, challenge } = data?.authentication;
     const secret = await sha256base64(`${this.options.password}${salt}`);
@@ -337,16 +349,16 @@ export class StreamerbotClient {
     try {
       // Force a getInfo call for backwards compat with Streamer.bot v0.2.4 and older
       if (!this._authEnabled) {
-        void this.getInfo().catch(() => console.debug('Failed to get Streamer.bot info'));
+        void this.getInfo().catch(() => this.logger?.debug('Failed to fetch Streamer.bot instance info'));
       }
       await this.handshake();
 
       if (this.version && this.info) {
-        console.debug(`Connected to Streamer.bot: v${this.version} (${this.info.name})`);
+        this.logger?.debug(`Connected to Streamer.bot: v${this.version} (${this.info.name})`);
         this?.options?.onConnect?.(this.info);
       }
     } catch (err) {
-      console.warn('Failed handshake with Streamer.bot', err);
+      this.logger?.warn('Failed handshake with Streamer.bot', err);
       this.options?.onError?.(err instanceof Error ? err : new Error('Failed handshake with Streamer.bot'));
       return await this.disconnect();
     }
@@ -362,9 +374,9 @@ export class StreamerbotClient {
         await this.subscribe(this.subscriptions);
       }
 
-      console.debug('Subscribed to requested events', this.subscriptions, this.listeners);
+      this.logger?.debug('Subscribed to requested events', this.subscriptions, this.listeners);
     } catch (e) {
-      console.warn('Error subscribing to requested events', e);
+      this.logger?.warn('Error subscribing to requested events', e);
     }
   }
 
@@ -376,12 +388,12 @@ export class StreamerbotClient {
         this?.options?.onError(new Error(getCloseEventReason(event)));
       this?.options?.onDisconnect?.();
     } catch (e) {
-      console.warn('Error invoking onDisconnect handler', e);
+      this.logger?.warn('Error invoking user-provided onDisconnect handler', e);
     }
 
     // No auto-reconnect, clean up
     if (this._explicitlyClosed || !this.options.autoReconnect) {
-      console.debug('Cleaning up...');
+      this.logger?.debug('Cleaning up...');
       return this.cleanup();
     }
 
@@ -394,23 +406,23 @@ export class StreamerbotClient {
       if (this._reconnectTimeout) clearTimeout(this._reconnectTimeout);
       this._reconnectTimeout = setTimeout(async () => {
         if (!!this.socket && this.socket.readyState !== this.socket.CLOSED) return;
-        console.debug(`Reconnecting... (attempt ${this._retried})`);
+        this.logger?.debug(`Reconnecting... (attempt ${this._retried})`);
         try {
           await this.connect(10_000);
         } catch (e) {
-          if (this._retried) console.warn(`Failed to reconnect (attempt ${this._retried - 1})`, e);
+          if (this._retried) this.logger?.warn(`Failed to reconnect (attempt ${this._retried - 1})`, e);
         }
       }, Math.min(30_000, this._retried * 1_000));
     }
     else {
-      console.debug('Auto-reconnect limit reached. Cleaning up...');
+      this.logger?.debug('Auto-reconnect limit reached. Cleaning up...');
       this.cleanup();
     }
   }
 
   protected async onMessage(event: MessageEvent): Promise<void> {
     if (!event.data || typeof event.data !== 'string') {
-      console.debug('Unknown message received', event);
+      this.logger?.debug('Unknown message received', event);
       return;
     }
 
@@ -418,15 +430,17 @@ export class StreamerbotClient {
     try {
       payload = JSON.parse(event.data);
     } catch (e) {
-      console.warn('Invalid JSON payload received', event.data);
+      this.logger?.warn('Invalid JSON payload received', event.data, e);
       return;
     }
+
+    this.logger?.verbose(`RECV`, payload);
 
     // onData handler
     try {
       if (this.options.onData) this?.options?.onData(payload);
     } catch (e) {
-      console.warn('Error invoking onData handler', e);
+      this.logger?.warn('Error occurred within user-provided onData callback', e);
     }
 
     // any listeners called from `.on`
@@ -448,21 +462,21 @@ export class StreamerbotClient {
         try {
           listener.callback(payload);
         } catch (e) {
-          console.warn('Error while invoking subscription callback', listener.events);
+          this.logger?.warn(`Error occurred within user-provided event callback (${listener.events})`, e);
         }
       }
     }
   }
 
   protected onError(event: Event): void {
-    console.debug('WebSocket onError', event);
+    this.logger?.debug('WebSocket onError', event);
     if (!!this.socket && this.socket.readyState !== this.socket.OPEN) {
       this._connectController.abort();
     }
     try {
       this?.options?.onError?.(new Error('WebSocket Error'));
     } catch (e) {
-      console.warn('Error invoking onError handler', e);
+      this.logger?.warn('Error occurred within user-provided onError callback', e);
     }
   }
 
@@ -512,20 +526,22 @@ export class StreamerbotClient {
     const response = await withTimeout(new Promise<T>((res, rej) => {
       this.socket?.addEventListener('message', (event) => {
         if (!('data' in event) || !event.data || typeof event.data !== 'string') {
-          console.debug('Unknown message received', event.data);
+          this.logger?.debug('Unknown message received', event.data);
           return;
         }
 
         try {
           const payload = JSON.parse(event?.data);
           if (payload?.id === id) {
+            this.logger?.verbose(`RECV :: ${request.request}`, payload);
             return res(payload);
           }
         } catch (e) {
-          console.warn('Invalid JSON payload received', event.data);
+          this.logger?.warn('Invalid JSON payload received', event.data);
           rej(e);
         }
       }, { signal });
+      this.logger?.verbose(`SEND :: ${request.request}`, { ...request, id });
       this.send({ ...request, id });
     }), {
       timeout,
@@ -541,7 +557,7 @@ export class StreamerbotClient {
           this?.options?.onData(response);
         }
       } catch (e) {
-        console.warn('Error invoking onData handler', e);
+        this.logger?.warn('Error invoking onData handler', e);
       }
 
       return {
@@ -613,9 +629,9 @@ export class StreamerbotClient {
         callback: listener,
       });
 
-      console.debug('Added subscription for', event);
+      this.logger?.debug('Added subscription for', event);
     } catch (e) {
-      console.warn('Failed adding subscription for', event, e);
+      this.logger?.warn('Failed adding subscription for', event, e);
     }
   }
 
