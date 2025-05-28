@@ -7,7 +7,7 @@ export default defineNuxtConfig({
     'nuxt-og-image',
     'nuxt-link-checker',
     '@nuxt/content',
-    '@nuxt/image',
+    // '@nuxt/image',
     '@nuxt/fonts'
   ],
 
