@@ -246,7 +246,7 @@ export class StreamerbotClient {
 
     this._connectController.signal.addEventListener('abort', () => {
       controller.abort();
-    }, { once: true });
+    }, { once: true, signal });
 
     const response = await withTimeout(
       new Promise<StreamerbotHelloRequest | StreamerbotInfo>((res, rej) => {
@@ -496,6 +496,10 @@ export class StreamerbotClient {
     id: string = '',
     timeout: number = 10_000
   ): Promise<T> {
+    if (!this.socket || this.socket.readyState !== this.socket.OPEN) {
+      throw new Error('WebSocket is not connected');
+    }
+
     if (!id) id = generateRequestId();
 
     const controller = new AbortController();
@@ -503,7 +507,7 @@ export class StreamerbotClient {
 
     this._connectController.signal.addEventListener('abort', () => {
       controller.abort();
-    }, { once: true });
+    }, { once: true, signal });
 
     const response = await withTimeout(new Promise<T>((res, rej) => {
       this.socket?.addEventListener('message', (event) => {
