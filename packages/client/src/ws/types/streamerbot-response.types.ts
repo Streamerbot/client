@@ -44,7 +44,10 @@ export type GetActionsResponse = StreamerbotResponse<{
   count: number;
 }>;
 
-export type DoActionResponse = StreamerbotResponse<{}>;
+export type DoActionResponse<T = Record<string, any>> = StreamerbotResponse<{
+  args?: Record<string, any>;
+  customEventResponseArgs?: T;
+}>;
 
 export type GetBroadcasterResponse = StreamerbotResponse<{
   platforms: Partial<BroadcasterPlatforms>;
@@ -70,7 +73,9 @@ export type GetActiveViewersResponse = StreamerbotResponse<{
   count: number;
 }>;
 
-export type ExecuteCodeTriggerResponse = StreamerbotResponse<unknown>;
+export type ExecuteCodeTriggerResponse<T = Record<string, any>> = StreamerbotResponse<{
+  customEventResponseArgs?: T;
+}>;
 
 export type GetCodeTriggersResponse = StreamerbotResponse<{
   triggers: Array<{

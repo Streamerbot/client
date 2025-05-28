@@ -37,7 +37,7 @@ import {
   UnsubscribeResponse,
   YouTubeGetEmotesResponse
 } from './types/streamerbot-response.types';
-import { generateRequestId, getCloseEventReason, sha256base64, withTimeout } from './util/websocket.util';
+import { generateId, getCloseEventReason, sha256base64, withCustomEventResponse, withTimeout } from './util/websocket.util';
 
 export type StreamerbotClientOptions = {
   scheme: 'ws' | 'wss' | string;
@@ -500,7 +500,7 @@ export class StreamerbotClient {
       throw new Error('WebSocket is not connected');
     }
 
-    if (!id) id = generateRequestId();
+    if (!id) id = generateId();
 
     const controller = new AbortController();
     const signal = controller.signal;
@@ -705,10 +705,15 @@ export class StreamerbotClient {
   /**
    * Get all actions from your connected Streamer.bot instance
    */
-  public async doAction(
+  public async doAction<T = Record<string, any>>(
     action: string | Partial<Pick<StreamerbotAction, 'id' | 'name'>>,
-    args?: Record<string, any>
-  ): Promise<DoActionResponse> {
+    args?: Record<string, any>,
+    options?: Partial<{
+      customEventResponse: boolean;
+    }>
+  ): Promise<DoActionResponse<T>> {
+    if (options?.customEventResponse) return this.doActionWithCustomEventResponse(action, args);
+
     let id, name;
 
     if (typeof action === 'string') {
@@ -718,7 +723,7 @@ export class StreamerbotClient {
       name = action.name;
     }
 
-    return await this.request<DoActionResponse>({
+    return await this.request<DoActionResponse<T>>({
       request: 'DoAction',
       action: {
         id,
@@ -726,6 +731,51 @@ export class StreamerbotClient {
       },
       args,
     });
+  }
+
+  /**
+   * Executes an action and waits for a matching Custom event response
+   *
+   * @param action The action ID or object with ID/name to execute
+   * @param args Optional arguments to pass to the action
+   * @param timeout Maximum time to wait for response in milliseconds
+   * @returns Promise resolving to the Custom event data
+   */
+  private async doActionWithCustomEventResponse<T = Record<string, any>>(
+    action: string | Partial<Pick<StreamerbotAction, 'id' | 'name'>>,
+    args: Record<string, any> = {},
+    timeout: number = 10_000
+  ): Promise<DoActionResponse<T>> {
+    if (!this.socket || this.socket.readyState !== this.socket.OPEN) {
+      throw new Error('WebSocket is not connected');
+    }
+
+    const { responseId: sbClientResponse, promise, controller } = withCustomEventResponse<T>({
+      timeout,
+      addEventListener: (event, handler) => this.on(event as any, handler as any),
+      removeEventListener: predicate => {
+        this.listeners = this.listeners.filter(l => !predicate(l));
+      }
+    });
+
+    const actionArgs = {
+      ...args,
+      sbClientResponse
+    };
+
+    try {
+      const response = await this.doAction(action, actionArgs);
+      const customEventResponseArgs = await promise;
+      return {
+        ...response,
+        customEventResponseArgs,
+      };
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        controller.abort();
+      }
+      throw error;
+    }
   }
 
   /**
@@ -798,13 +848,63 @@ export class StreamerbotClient {
    */
   public async executeCodeTrigger(
     triggerName: string,
-    args?: Record<string, any>
+    args?: Record<string, any>,
+    options?: Partial<{
+      customEventResponse: boolean;
+    }>
   ): Promise<ExecuteCodeTriggerResponse> {
+    if (options?.customEventResponse) return this.executeCodeTriggerWithCustomEventResponse(triggerName, args);
+
     return await this.request<ExecuteCodeTriggerResponse>({
       request: 'ExecuteCodeTrigger',
       triggerName,
       args,
     });
+  }
+
+  /**
+   * Executes a code trigger and waits for a matching Custom event response
+   *
+   * @param triggerName The name of the code trigger to execute
+   * @param args Optional arguments to pass to the code trigger
+   * @param timeout Maximum time to wait for response in milliseconds
+   * @returns Promise resolving to the Custom event data
+   */
+  private async executeCodeTriggerWithCustomEventResponse<T = Record<string, any>>(
+    triggerName: string,
+    args: Record<string, any> = {},
+    timeout: number = 10_000
+  ): Promise<ExecuteCodeTriggerResponse<T>> {
+    if (!this.socket || this.socket.readyState !== this.socket.OPEN) {
+      throw new Error('WebSocket is not connected');
+    }
+
+    const { responseId: sbClientResponse, promise, controller } = withCustomEventResponse<T>({
+      timeout,
+      addEventListener: (event, handler) => this.on(event as any, handler as any),
+      removeEventListener: predicate => {
+        this.listeners = this.listeners.filter(l => !predicate(l));
+      }
+    });
+
+    const triggerArgs = {
+      ...args,
+      sbClientResponse
+    };
+
+    try {
+      const response = await this.executeCodeTrigger(triggerName, triggerArgs);
+      const customEventResponseArgs = await promise;
+      return {
+        ...response,
+        customEventResponseArgs,
+      };
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        controller.abort();
+      }
+      throw error;
+    }
   }
 
   /**
