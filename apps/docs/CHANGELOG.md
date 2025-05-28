@@ -1,5 +1,11 @@
 # @streamerbot/client-docs
 
+## 1.11.0
+
+### Minor Changes
+
+- Add basic logger implementation with custom overrides
+
 ## 1.10.0
 
 ### Minor Changes

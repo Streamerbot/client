@@ -1,5 +1,17 @@
 # @streamerbot/toolkit
 
+## 1.11.0
+
+### Minor Changes
+
+- Add basic logger implementation with custom overrides
+
+### Patch Changes
+
+- Updated dependencies
+  - @streamerbot/client@1.11.0
+  - @streamerbot/vue@2.0.0
+
 ## 1.10.0
 
 ### Minor Changes
