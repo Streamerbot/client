@@ -6,7 +6,7 @@
   "module": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "DEBUG=* node --watch index.js",
+    "dev": "DEBUG=* node --trace-warnings --watch index.js",
     "start": "node index.js"
   },
   "dependencies": {
