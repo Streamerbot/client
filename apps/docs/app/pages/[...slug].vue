@@ -34,7 +34,7 @@ const { communityLinks, ecosystemLinks } = useLinks(page);
 </script>
 
 <template>
-  <UPage>
+  <UPage v-if="page">
     <UPageHeader :title="page.title" :description="page.description" :links="page.links" :headline="headline" class="relative">
       <template v-if="!page.links && page.logo" #default>
         <div class="absolute top-16 right-0">

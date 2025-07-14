@@ -26,9 +26,12 @@ export type YouTubeEvents = VerifyEventTypes<
     BetterTTVEmoteAdded: UnknownEventData;
     BetterTTVEmoteRemoved: UnknownEventData;
     BroadcastMonitoringStarted: UnknownEventData;
-    BroadcastMonitoringEnded: UnknownEventData
-    BroadcastAdded: UnknownEventData
-    BroadcastRemoved: UnknownEventData
+    BroadcastMonitoringEnded: UnknownEventData;
+    BroadcastAdded: UnknownEventData;
+    BroadcastRemoved: UnknownEventData;
+    PollUpdated: UnknownEventData;
+    PollClosed: UnknownEventData;
+    PollStarted: UnknownEventData;
   }
 >;
 

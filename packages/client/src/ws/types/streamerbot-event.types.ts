@@ -61,6 +61,8 @@ export type StreamerbotEventsBySource = VerifyEventSources<{
   Group: any;
   HotKey: any;
   HypeRate: any;
+  Inputs: any;
+  Kick: any;
   Kofi: any;
   MeldStudio: any;
   Midi: any;
@@ -76,9 +78,11 @@ export type StreamerbotEventsBySource = VerifyEventSources<{
   SpeechToText: any;
   StreamDeck: any;
   StreamElements: any;
+  StreamerBot: any;
   StreamerBotRemote: any;
   Streamlabs: any;
   StreamlabsDesktop: any;
+  System: any;
   ThrowingSystem: any;
   TipeeeStream: any;
   TreatStream: any;

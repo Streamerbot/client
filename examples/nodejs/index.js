@@ -51,6 +51,14 @@ client.on('Twitch.ChatMessage', ({ data }) => {
   pinoLogger.info(`[Twitch.ChatMessage] ${data.message.displayName}: ${data.message.message}`);
 });
 
+client.on('Kick.*', ({ data }) => {
+  pinoLogger.info(`[Kick.*] ${data.message.displayName}: ${data.message.message}`);
+});
+
+// client.on('*', ({ event, data }) => {
+//   pinoLogger.info(`[${event.source}.${event.type}] ${JSON.stringify(data)}`);
+// });
+
 async function fetchGlobal() {
   try {
     const test = await client.getGlobal('test');

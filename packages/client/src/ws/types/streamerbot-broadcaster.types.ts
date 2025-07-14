@@ -1,4 +1,4 @@
-export type StreamerbotPlatform = 'twitch' | 'youtube' | 'trovo';
+export type StreamerbotPlatform = 'twitch' | 'youtube' | 'trovo' | 'kick';
 
 export type TwitchBroadcaster = {
   broadcastUser: string;
