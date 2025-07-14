@@ -1,6 +1,6 @@
 {
   "name": "@streamerbot/node-client-demo",
-  "version": "1.11.0",
+  "version": "1.12.0",
   "description": "",
   "private": true,
   "module": "index.js",

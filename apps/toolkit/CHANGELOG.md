@@ -1,5 +1,17 @@
 # @streamerbot/toolkit
 
+## 1.12.0
+
+### Minor Changes
+
+- Support for event subscriptions from any Stremaer.bot version, add Kick support.
+
+### Patch Changes
+
+- Updated dependencies
+  - @streamerbot/client@1.12.0
+  - @streamerbot/vue@2.0.0
+
 ## 1.11.0
 
 ### Minor Changes

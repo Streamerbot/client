@@ -1,5 +1,11 @@
 # @streamerbot/client-docs
 
+## 1.12.0
+
+### Minor Changes
+
+- Support for event subscriptions from any Stremaer.bot version, add Kick support.
+
 ## 1.11.0
 
 ### Minor Changes
