@@ -27,7 +27,7 @@ export type StreamerbotOkResponse<T> = StreamerbotResponse<T, 'ok'>;
 export type StreamerbotErrorResponse = StreamerbotResponse<{ error: string }, 'error'>;
 export type MaybeStreamerbotResponse<T> = StreamerbotOkResponse<T> | StreamerbotErrorResponse;
 
-export type SubscribeResponse = StreamerbotResponse<{
+export type SubscribeResponse = MaybeStreamerbotResponse<{
   events: StreamerbotEventsSubscription;
 }>;
 

@@ -45,14 +45,15 @@ const client = new StreamerbotClient({
   },
   logger: customLogger,
   logLevel: 'debug',
+  subscribe: ['General.Custom'],
 });
 
 client.on('Twitch.ChatMessage', ({ data }) => {
   pinoLogger.info(`[Twitch.ChatMessage] ${data.message.displayName}: ${data.message.message}`);
 });
 
-client.on('Kick.*', ({ data }) => {
-  pinoLogger.info(`[Kick.*] ${data.message.displayName}: ${data.message.message}`);
+client.on('Kick.ChatMessage', ({ data }) => {
+  pinoLogger.info(`[Kick.ChatMessage] ${data.user.name}: ${data.text}`);
 });
 
 // client.on('*', ({ event, data }) => {

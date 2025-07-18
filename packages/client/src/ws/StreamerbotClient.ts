@@ -382,8 +382,16 @@ export class StreamerbotClient {
 
     try {
       // Subscribe to initial subscriptions requested in client options
-      if (this.options.subscribe === '*' || Object.keys(this.options.subscribe ?? {}).length) {
+      if (this.options.subscribe === '*' || (typeof this.options.subscribe === 'object' && !Array.isArray(this.options.subscribe) && Object.keys(this.options.subscribe ?? {}).length)) {
+        this.logger?.debug('Subscribing to initial events from options:', this.options.subscribe);
         await this.subscribe(this.options.subscribe);
+      } else if (typeof this.options.subscribe === 'string' || Array.isArray(this.options.subscribe)) {
+        this.logger?.debug('Subscribing to initial events from options:', this.options.subscribe);
+        const subscriptions = await this.getSubscriptionsFromEventStrings(this.options.subscribe);
+        this.logger?.debug('Parsed subscriptions from options:', subscriptions);
+        if (subscriptions) {
+          await this.subscribe(subscriptions);
+        }
       }
 
       // Subscribe to any events from listeners added with .on
@@ -638,6 +646,9 @@ export class StreamerbotClient {
 
     try {
       const eventsResponse = await this.getEvents();
+      if (eventsResponse.status !== 'ok' || !eventsResponse.events) {
+        throw new Error(eventsResponse.status);
+      }
       this.supportedEvents = eventsResponse.events as StreamerbotEventsTypeWriteable;
       this.logger?.debug(`Successfully fetched supported event types for Streamer.bot v${this.version}`);
     } catch(error) {
@@ -659,17 +670,15 @@ export class StreamerbotClient {
     return this.supportedEvents ?? StreamerbotEvents as StreamerbotEventsTypeWriteable;
   }
 
-  /**
-   * Parse the configured listeners and return a subscription object
-   *
-   * @param listeners - Optional array of listeners to parse. If not provided, it uses the current instance's listeners.
-   * @returns A StreamerbotEventsSubscription object ready to be used for subscribing to events.
-   */
-  private async getSubscriptionsFromListeners(listeners?: typeof this.listeners): Promise<StreamerbotEventsSubscription> {
-    const subscriptions = {} as StreamerbotEventsSubscription;
-    const supportedEvents = await this.getSupportedEvents();
 
-    const events = (listeners ?? this.listeners).reduce((acc, listener) => {
+  /**
+   * Extract events from the configured listeners
+   *
+   * @param listeners - Optional array of listeners to extract events from. If not provided, it uses the current instance's listeners.
+   * @return A record mapping event names to their corresponding listener callbacks.
+   */
+  private getEventsFromListeners(listeners?: typeof this.listeners) {
+    return (listeners ?? this.listeners).reduce((acc, listener) => {
       listener.events.forEach(event => {
         if (!acc[event]) {
           acc[event] = [];
@@ -678,49 +687,86 @@ export class StreamerbotClient {
       });
       return acc;
     }, {} as Record<StreamerbotEventName | '*', Array<(data: any) => void>>);
+  }
 
-    for (const event in events) {
-      // Subscribe to all events
-      if (event === '*') {
-        for (const key in supportedEvents) {
-          if (key === undefined) continue;
-          if (!Object.keys(supportedEvents).includes(key)) continue;
+  /**
+   * Parse the configured listeners and return a subscription object
+   *
+   * @param listeners - Optional array of listeners to parse. If not provided, it uses the current instance's listeners.
+   * @returns A StreamerbotEventsSubscription object ready to be used for subscribing to events.
+   */
+  private async getSubscriptionsFromListeners(listeners?: typeof this.listeners): Promise<StreamerbotEventsSubscription> {
+    const events = this.getEventsFromListeners(listeners);
+    return this.getSubscriptionsFromEventStrings(Object.keys(events));
+  }
 
-          const eventSource = key as keyof typeof supportedEvents;
-          const eventTypes = supportedEvents[eventSource] ?? [];
+  /**
+   * Parse an array of event strings and return a structured subscription object
+   *
+   * @param events - An array of event strings to parse, e.g. ['Twitch.ChatMessage', 'YouTube.*', '*']
+   * @returns A StreamerbotEventsSubscription object mapping event sources to their types.
+   */
+  private async getSubscriptionsFromEventStrings(events: string | string[]): Promise<StreamerbotEventsSubscription> {
+    const subscriptions: StreamerbotEventsSubscription = {};
 
-          if (eventTypes && eventTypes.length) {
-            const set = new Set([...(this.subscriptions[eventSource] ?? []), ...eventTypes]);
-            this.subscriptions[eventSource] = [...set] as any[];
-          }
-        }
-      }
-      // Handle narrowed event requests
-      else {
-        // Validate event string
-        const [source, type] = event.split('.', 2);
-        if (!source || !type || !(source in supportedEvents)) {
-          this.logger?.warn(`Invalid event subscription requested "${event}"`);
-          continue;
-        }
+    if (typeof events === 'string') {
+      events = [events];
+    }
 
-        const eventSource = source as keyof StreamerbotEventsTypeWriteable;
-        const eventType = type as
-          | StreamerbotEventsTypeWriteable[keyof StreamerbotEventsTypeWriteable][number]
-          | '*';
-        if (eventType) {
-          const set = new Set([
-            ...(this.subscriptions[eventSource] ?? []),
-            ...(eventType === '*' ? supportedEvents[eventSource] : [eventType]),
-          ]);
-          this.subscriptions[eventSource] = [...set] as any;
-        } else {
-          throw new Error('Invalid event type');
-        }
-      }
+    for (const event of events) {
+      const result = await this.parseEventString(event);
+      if (!result) continue;
+
+      const { source, eventTypes } = result;
+      const set = new Set([...(subscriptions[source] ?? []), ...eventTypes]);
+      subscriptions[source] = [...set] as any;
     }
 
     return subscriptions;
+  }
+
+  /**
+   * Parse a string event subscription into a structured object
+   *
+   * @param event - The event string to parse, e.g. 'Twitch.ChatMessage', 'YouTube.*', '*'
+   * @returns An object containing the event source and types, or undefined if the event is invalid
+   */
+  private async parseEventString(event: string): Promise<{ source: StreamerbotEventSource; eventTypes: string[]; } | undefined> {
+    const supportedEvents = await this.getSupportedEvents();
+    if (!event || typeof event !== 'string') {
+      this.logger?.warn(`Invalid event subscription requested "${event}"`);
+      return;
+    }
+
+    if (event === '*') {
+      for (const key in supportedEvents) {
+        if (key === undefined) continue;
+        if (!Object.keys(supportedEvents).includes(key)) continue;
+
+        const eventSource = key as keyof typeof supportedEvents;
+        const eventTypes = supportedEvents[eventSource] ?? [];
+
+        return { source: eventSource, eventTypes };
+      }
+    }
+    else {
+      const [source, type] = event.split('.', 2);
+      if (!source || !type || !(source in supportedEvents)) {
+        this.logger?.warn(`Invalid event subscription requested "${event}"`);
+        return;
+      }
+
+      const eventSource = source as keyof StreamerbotEventsTypeWriteable;
+      const eventType = type as
+        | StreamerbotEventsTypeWriteable[keyof StreamerbotEventsTypeWriteable][number]
+        | '*';
+      if (eventType) {
+        return { source: eventSource, eventTypes: eventType === '*' ? supportedEvents[eventSource] : [eventType] };
+      } else {
+        this.logger?.warn(`Invalid event type requested "${event}"`);
+        return;
+      }
+    }
   }
 
   /**
@@ -735,8 +781,13 @@ export class StreamerbotClient {
     }
 
     for (const key in events) {
+      if (!key || key === 'err') continue;
+
       // Skip unknown keys
-      if (!key || !(key in supportedEvents)) continue;
+      if (!(key in supportedEvents)) {
+        this.logger?.warn(`Attempted to subscribe to empty or unknown event source: "${key}"`, Object.keys(events));
+        continue;
+      }
 
       const eventSource = key as keyof typeof events;
       const eventTypes = events[eventSource] ?? [];
@@ -745,6 +796,12 @@ export class StreamerbotClient {
         const set = new Set([...(this.subscriptions[eventSource] ?? []), ...eventTypes]);
         this.subscriptions[eventSource] = [...set] as any[];
       }
+    }
+
+    // Short circuit invalid subscription request
+    if (Object.keys(this.subscriptions).length === 0) {
+      this.logger?.warn('No valid events to subscribe to. Please provide valid event sources and types.');
+      return { id: 'invalid', status: 'error', error: 'No valid events to subscribe to' };
     }
 
     return await this.request<SubscribeResponse>({
