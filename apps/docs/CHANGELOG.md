@@ -1,5 +1,11 @@
 # @streamerbot/client-docs
 
+## 1.12.1
+
+### Patch Changes
+
+- Allow .on style subscription strings in subscribe option
+
 ## 1.12.0
 
 ### Minor Changes

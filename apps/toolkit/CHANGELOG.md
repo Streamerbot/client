@@ -1,5 +1,14 @@
 # @streamerbot/toolkit
 
+## 1.12.1
+
+### Patch Changes
+
+- Allow .on style subscription strings in subscribe option
+- Updated dependencies
+  - @streamerbot/client@1.12.1
+  - @streamerbot/vue@1.12.1
+
 ## 1.12.0
 
 ### Minor Changes
