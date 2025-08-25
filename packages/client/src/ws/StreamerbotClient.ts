@@ -717,9 +717,11 @@ export class StreamerbotClient {
       const result = await this.parseEventString(event);
       if (!result) continue;
 
-      const { source, eventTypes } = result;
-      const set = new Set([...(subscriptions[source] ?? []), ...eventTypes]);
-      subscriptions[source] = [...set] as any;
+      for (const item of result) {
+        const { source, eventTypes } = item;
+        const set = new Set([...(subscriptions[source] ?? []), ...eventTypes]);
+        subscriptions[source] = [...set] as any;
+      }
     }
 
     return subscriptions;
@@ -731,7 +733,7 @@ export class StreamerbotClient {
    * @param event - The event string to parse, e.g. 'Twitch.ChatMessage', 'YouTube.*', '*'
    * @returns An object containing the event source and types, or undefined if the event is invalid
    */
-  private async parseEventString(event: string): Promise<{ source: StreamerbotEventSource; eventTypes: string[]; } | undefined> {
+  private async parseEventString(event: string): Promise<{ source: StreamerbotEventSource; eventTypes: string[]; }[] | undefined> {
     const supportedEvents = await this.getSupportedEvents();
     if (!event || typeof event !== 'string') {
       this.logger?.warn(`Invalid event subscription requested "${event}"`);
@@ -739,15 +741,11 @@ export class StreamerbotClient {
     }
 
     if (event === '*') {
-      for (const key in supportedEvents) {
-        if (key === undefined) continue;
-        if (!Object.keys(supportedEvents).includes(key)) continue;
-
+      return Object.keys(supportedEvents).map(key => {
         const eventSource = key as keyof typeof supportedEvents;
         const eventTypes = supportedEvents[eventSource] ?? [];
-
         return { source: eventSource, eventTypes };
-      }
+      });
     }
     else {
       const [source, type] = event.split('.', 2);
@@ -761,7 +759,7 @@ export class StreamerbotClient {
         | StreamerbotEventsTypeWriteable[keyof StreamerbotEventsTypeWriteable][number]
         | '*';
       if (eventType) {
-        return { source: eventSource, eventTypes: eventType === '*' ? supportedEvents[eventSource] : [eventType] };
+        return [{ source: eventSource, eventTypes: eventType === '*' ? supportedEvents[eventSource] : [eventType] }];
       } else {
         this.logger?.warn(`Invalid event type requested "${event}"`);
         return;

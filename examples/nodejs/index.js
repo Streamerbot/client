@@ -48,17 +48,17 @@ const client = new StreamerbotClient({
   subscribe: ['General.Custom'],
 });
 
-client.on('Twitch.ChatMessage', ({ data }) => {
-  pinoLogger.info(`[Twitch.ChatMessage] ${data.message.displayName}: ${data.message.message}`);
-});
-
-client.on('Kick.ChatMessage', ({ data }) => {
-  pinoLogger.info(`[Kick.ChatMessage] ${data.user.name}: ${data.text}`);
-});
-
-// client.on('*', ({ event, data }) => {
-//   pinoLogger.info(`[${event.source}.${event.type}] ${JSON.stringify(data)}`);
+// client.on('Twitch.ChatMessage', ({ data }) => {
+//   pinoLogger.info(`[Twitch.ChatMessage] ${data.message.displayName}: ${data.message.message}`);
 // });
+
+// client.on('Kick.ChatMessage', ({ data }) => {
+//   pinoLogger.info(`[Kick.ChatMessage] ${data.user.name}: ${data.text}`);
+// });
+
+client.on('Twitch.*', ({ event, data }) => {
+  pinoLogger.info(`[${event.source}.${event.type}] ${JSON.stringify(data)}`);
+});
 
 async function fetchGlobal() {
   try {
