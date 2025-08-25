@@ -1,5 +1,13 @@
 # @streamerbot/vue-ts
 
+## 1.12.2
+
+### Patch Changes
+
+- Fix .on('\*') subscriptions
+- Updated dependencies
+  - @streamerbot/vue@1.12.2
+
 ## 1.12.1
 
 ### Patch Changes

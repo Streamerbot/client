@@ -1,5 +1,13 @@
 # @streamerbot/node-client-demo
 
+## 1.12.2
+
+### Patch Changes
+
+- Fix .on('\*') subscriptions
+- Updated dependencies
+  - @streamerbot/client@1.12.2
+
 ## 1.12.1
 
 ### Patch Changes

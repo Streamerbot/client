@@ -1,5 +1,11 @@
 # @streamerbot/client-docs
 
+## 1.12.2
+
+### Patch Changes
+
+- Fix .on('\*') subscriptions
+
 ## 1.12.1
 
 ### Patch Changes
