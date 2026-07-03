@@ -6,16 +6,16 @@ const pinoLogger = pino({
   transport: {
     target: 'pino-pretty',
     options: {
-      colorize: true
-    }
-  }
+      colorize: true,
+    },
+  },
 });
 
 const customLogger = new Logger({
   customLogger: (level, ...args) => {
-    const message = args.filter(arg => typeof arg === 'string').join(' ');
-    const data = args.find(arg => typeof arg === 'object') || {};
-    data.err = args.find(arg => arg instanceof Error) ?? undefined;
+    const message = args.filter((arg) => typeof arg === 'string').join(' ');
+    const data = args.find((arg) => typeof arg === 'object') || {};
+    data.err = args.find((arg) => arg instanceof Error) ?? undefined;
 
     switch (level) {
       case 'verbose':
@@ -34,7 +34,7 @@ const customLogger = new Logger({
         pinoLogger.error(data, message);
         break;
     }
-  }
+  },
 });
 
 const client = new StreamerbotClient({
@@ -70,7 +70,11 @@ async function fetchGlobal() {
 
 async function testDoAction() {
   try {
-    const response = await client.doAction({ name: 'Test' }, { test: 'Sent from testDoAction :)' }, { customEventResponse: true });
+    const response = await client.doAction(
+      { name: 'Test' },
+      { test: 'Sent from testDoAction :)' },
+      { customEventResponse: true },
+    );
   } catch (e) {
     pinoLogger.error('Error executing action:', e);
   }
@@ -78,7 +82,11 @@ async function testDoAction() {
 
 async function testCustomCodeTrigger() {
   try {
-    const response = await client.executeCodeTrigger('musicbee_connected', { test: 'Sent from testCustomCodeTrigger :)' }, { customEventResponse: true });
+    const response = await client.executeCodeTrigger(
+      'musicbee_connected',
+      { test: 'Sent from testCustomCodeTrigger :)' },
+      { customEventResponse: true },
+    );
   } catch (e) {
     pinoLogger.error('Error executing action:', e);
   }

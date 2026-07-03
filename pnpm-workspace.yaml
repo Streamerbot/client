@@ -3,3 +3,8 @@ packages:
   - 'apps/*'
   - 'examples/*'
   - '!**/test/**'
+allowBuilds:
+  bufferutil: true
+  esbuild: true
+  sharp: true
+  vue-demi: true

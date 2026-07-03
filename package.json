@@ -6,17 +6,17 @@
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format": "turbo run format",
     "publish-packages": "turbo run build && changeset version && changeset publish"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.9",
-    "eslint": "^8.57.1",
-    "prettier": "^3.3.3",
+    "oxfmt": "^0.57.0",
+    "oxlint": "^1.72.0",
     "turbo": "^1.13.4"
   },
   "engines": {
     "node": ">=14.0.0"
   },
-  "packageManager": "pnpm@9.11.0"
+  "packageManager": "pnpm@11.9.0"
 }
