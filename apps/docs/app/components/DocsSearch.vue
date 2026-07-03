@@ -21,7 +21,6 @@ const config = {
     },
     group: {
       command: {
-        // eslint-disable-next-line quotes
         prefix: `!text-foreground after:content-['_>']`,
       },
     },
@@ -85,7 +84,7 @@ const fuse: ComputedRef<Partial<UseFuseOptions<Command>>> = computed(() =>
       ],
     },
     resultLimit: 12,
-  })
+  }),
 );
 
 const groups = computed<Group[]>(() => {
@@ -121,12 +120,16 @@ const groups = computed<Group[]>(() => {
         commands: props.files
           .filter((file) => file._path?.startsWith(link._path))
           .flatMap((file) => {
-            const category = findPageBreadcrumb(props.navigation, file).slice(1, 4)?.filter(
-              (child) =>
-                file._path.startsWith(child._path) &&
-                file._path !== child._path &&
-                child.children?.length
-            )?.map(c => c.title).join(' > ');
+            const category = findPageBreadcrumb(props.navigation, file)
+              .slice(1, 4)
+              ?.filter(
+                (child) =>
+                  file._path.startsWith(child._path) &&
+                  file._path !== child._path &&
+                  child.children?.length,
+              )
+              ?.map((c) => c.title)
+              .join(' > ');
 
             return [
               {
@@ -155,7 +158,7 @@ const groups = computed<Group[]>(() => {
                     icon: fileIcon(file),
                     child: true,
                   };
-                }
+                },
               ),
             ].filter(Boolean);
           }),
