@@ -1,5 +1,11 @@
 # @streamerbot/client
 
+## 2.0.1
+
+### Patch Changes
+
+- Updated cjs/mjs exports
+
 ## 2.0.0
 
 ### Major Changes

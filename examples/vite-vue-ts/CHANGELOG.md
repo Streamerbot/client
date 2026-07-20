@@ -1,5 +1,13 @@
 # @streamerbot/vue-ts
 
+## 2.0.1
+
+### Patch Changes
+
+- Updated cjs/mjs exports
+- Updated dependencies
+  - @streamerbot/vue@2.0.2
+
 ## 2.0.0
 
 ### Major Changes

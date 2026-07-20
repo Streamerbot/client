@@ -1,5 +1,14 @@
 # @streamerbot/toolkit
 
+## 2.0.1
+
+### Patch Changes
+
+- Updated cjs/mjs exports
+- Updated dependencies
+  - @streamerbot/client@2.0.1
+  - @streamerbot/vue@2.0.2
+
 ## 2.0.0
 
 ### Major Changes

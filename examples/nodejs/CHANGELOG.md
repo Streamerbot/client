@@ -1,5 +1,13 @@
 # @streamerbot/node-client-demo
 
+## 2.0.1
+
+### Patch Changes
+
+- Updated cjs/mjs exports
+- Updated dependencies
+  - @streamerbot/client@2.0.1
+
 ## 2.0.0
 
 ### Major Changes

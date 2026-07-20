@@ -1,6 +1,6 @@
 {
   "name": "@streamerbot/vue",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Streamer.bot Vue Composition Utilities",
   "author": "Whipstickgostop <https://github.com/whiptsickgostop>",
   "license": "MIT",
@@ -58,7 +58,7 @@
     "vue-tsc": "^3.3.7"
   },
   "peerDependencies": {
-    "@streamerbot/client": "^2.0.0",
+    "@streamerbot/client": "^2.0.1",
     "vue": "^3.2.0"
   }
 }
