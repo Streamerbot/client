@@ -15,41 +15,40 @@
     "vue"
   ],
   "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     },
     "./components": {
-      "types": "./dist/components/index.d.ts",
-      "import": "./dist/components/index.mjs",
-      "require": "./dist/components/index.js"
+      "types": "./dist/components.d.ts",
+      "import": "./dist/components.js",
+      "require": "./dist/components.cjs"
     }
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
   "files": [
-    "components.d.ts",
     "dist"
   ],
   "scripts": {
     "dev": "pnpm build --watch",
-    "build": "unbuild",
+    "build": "tsdown",
     "lint": "tsc",
     "prepublishOnly": "pnpm build"
   },
   "devDependencies": {
     "@streamerbot/client": "workspace:^",
-    "mkdist": "^1.6.0",
-    "typescript": "^5.6.3",
-    "unbuild": "^2.0.0"
-  },
-  "dependencies": {
-    "vue-demi": "^0.14.10"
+    "tsdown": "^0.22.12",
+    "typescript": "^6.0.3",
+    "unplugin-vue": "^7.2.0",
+    "vue": "^3.5.40",
+    "vue-tsc": "^3.3.7"
   },
   "peerDependencies": {
-    "@streamerbot/client": "^1.12.2"
+    "@streamerbot/client": "^1.12.2",
+    "vue": "^3.2.0"
   }
 }

@@ -43,7 +43,7 @@ const client = new StreamerbotClient({
     testDoAction();
     testCustomCodeTrigger();
   },
-  logger: customLogger,
+  // logger: customLogger,
   logLevel: 'debug',
   subscribe: ['General.Custom'],
 });

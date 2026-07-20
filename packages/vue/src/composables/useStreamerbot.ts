@@ -2,9 +2,19 @@ import {
   StreamerbotClient,
   StreamerbotClientOptions,
   StreamerbotInfo,
-  WebSocketStatus
+  WebSocketStatus,
 } from '@streamerbot/client';
-import { Ref, ref, toValue, computed, onMounted, onBeforeUnmount, MaybeRefOrGetter, watch, provide } from 'vue-demi';
+import {
+  computed,
+  MaybeRefOrGetter,
+  onBeforeUnmount,
+  onMounted,
+  provide,
+  Ref,
+  ref,
+  toValue,
+  watch,
+} from 'vue';
 import { INJECT_CLIENT, INJECT_CLIENT_STATUS } from '../utils/keys.util';
 
 export type UseStreamerbotOptions = MaybeRefOrGetter<Partial<StreamerbotClientOptions>>;
@@ -16,12 +26,14 @@ export type UseStreamerbotReturn = {
   connect: () => void;
   disconnect: () => void;
   client: Ref<StreamerbotClient | undefined>;
-}
+};
 
 export function useStreamerbot(options: UseStreamerbotOptions): UseStreamerbotReturn {
-  const _options = computed<Partial<StreamerbotClientOptions>>(() => typeof options === 'function' ? options() : toValue(options));
+  const _options = computed<Partial<StreamerbotClientOptions>>(() =>
+    typeof options === 'function' ? options() : toValue(options),
+  );
   const _optionsChanged = ref(false);
-  watch(_options, () => _optionsChanged.value = true, { deep: true, immediate: true });
+  watch(_options, () => (_optionsChanged.value = true), { deep: true, immediate: true });
 
   const data = ref();
   const status = ref<WebSocketStatus>('CLOSED');
@@ -31,7 +43,7 @@ export function useStreamerbot(options: UseStreamerbotOptions): UseStreamerbotRe
   function onConnect(data: StreamerbotInfo) {
     status.value = 'OPEN';
     error.value = undefined;
-    let cb = toValue(_options.value).onConnect
+    let cb = toValue(_options.value).onConnect;
     cb?.(data);
   }
 
@@ -88,8 +100,8 @@ export function useStreamerbot(options: UseStreamerbotOptions): UseStreamerbotRe
         };
       }
       return Reflect.get(target, prop, receiver);
-    }
-  }
+    },
+  };
 
   async function _init(immediate: boolean = false) {
     if (clientRef.value) {
@@ -100,21 +112,24 @@ export function useStreamerbot(options: UseStreamerbotOptions): UseStreamerbotRe
 
     if (immediate) status.value = 'CONNECTING';
 
-    _client = new Proxy(new StreamerbotClient({
-      scheme: toValue(_options.value.scheme) || 'ws',
-      host: toValue(_options.value.host) || '127.0.0.1',
-      port: toValue(_options.value.port) || 8080,
-      endpoint: toValue(_options.value.endpoint) || '/',
-      password: toValue(_options.value.password) || '',
-      immediate: immediate,
-      subscribe: toValue(_options.value.subscribe),
-      autoReconnect: toValue(_options.value.autoReconnect) ?? true,
-      retries: toValue(_options.value.retries) ?? -1,
-      onConnect,
-      onDisconnect,
-      onError,
-      onData
-    }), _clientHandler);
+    _client = new Proxy(
+      new StreamerbotClient({
+        scheme: toValue(_options.value.scheme) || 'ws',
+        host: toValue(_options.value.host) || '127.0.0.1',
+        port: toValue(_options.value.port) || 8080,
+        endpoint: toValue(_options.value.endpoint) || '/',
+        password: toValue(_options.value.password) || '',
+        immediate: immediate,
+        subscribe: toValue(_options.value.subscribe),
+        autoReconnect: toValue(_options.value.autoReconnect) ?? true,
+        retries: toValue(_options.value.retries) ?? -1,
+        onConnect,
+        onDisconnect,
+        onError,
+        onData,
+      }),
+      _clientHandler,
+    );
     clientRef.value = _client;
     _optionsChanged.value = false;
   }
@@ -136,6 +151,6 @@ export function useStreamerbot(options: UseStreamerbotOptions): UseStreamerbotRe
     error,
     connect,
     disconnect,
-    client: clientRef
-  }
+    client: clientRef,
+  };
 }

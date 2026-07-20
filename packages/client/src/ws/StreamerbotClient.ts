@@ -1,6 +1,10 @@
-import type { WebSocket as WebSocketNode } from 'ws';
 import { defaultLogger, Logger, LogLevel } from '../utils/logger';
-import { StreamerbotAction, StreamerbotInfo, StreamerbotPlatform, StreamerbotVariableValue } from './types';
+import {
+  StreamerbotAction,
+  StreamerbotInfo,
+  StreamerbotPlatform,
+  StreamerbotVariableValue,
+} from './types';
 import { StreamerbotEvents } from './types/events';
 import { StreamerbotHelloRequest } from './types/streamerbot-auth.types';
 import {
@@ -8,7 +12,7 @@ import {
   StreamerbotEventPayload,
   StreamerbotEventSource,
   StreamerbotEventsSubscription,
-  StreamerbotEventsTypeWriteable
+  StreamerbotEventsTypeWriteable,
 } from './types/streamerbot-event.types';
 import { StreamerbotRequest, StreamerbotRequestName } from './types/streamerbot-request.types';
 import {
@@ -36,9 +40,15 @@ import {
   TestCreditsResponse,
   TwitchGetEmotesResponse,
   UnsubscribeResponse,
-  YouTubeGetEmotesResponse
+  YouTubeGetEmotesResponse,
 } from './types/streamerbot-response.types';
-import { generateId, getCloseEventReason, sha256base64, withCustomEventResponse, withTimeout } from './util/websocket.util';
+import {
+  generateId,
+  getCloseEventReason,
+  sha256base64,
+  withCustomEventResponse,
+  withTimeout,
+} from './util/websocket.util';
 
 export type StreamerbotClientOptions = {
   scheme: 'ws' | 'wss' | string;
@@ -49,9 +59,7 @@ export type StreamerbotClientOptions = {
   immediate: boolean;
   autoReconnect: boolean;
   retries: number;
-  subscribe:
-    | StreamerbotEventsSubscription
-    | '*';
+  subscribe: StreamerbotEventsSubscription | '*';
   onConnect?: (data: StreamerbotInfo) => void;
   onDisconnect?: () => void;
   onError?: (error: Error) => void;
@@ -119,7 +127,7 @@ export class StreamerbotClient {
   private readonly options: StreamerbotClientOptions;
   private logger: Logger | null;
 
-  protected socket?: WebSocket | WebSocketNode;
+  protected socket?: WebSocket;
 
   protected info?: StreamerbotInfo;
   protected version?: string;
@@ -150,7 +158,7 @@ export class StreamerbotClient {
     }
 
     if (true === this.options.immediate) {
-      this.connect().catch(e => this.logger?.warn('Failed to connect:', e));
+      this.connect().catch((e) => this.logger?.warn('Failed to connect:', e));
     }
   }
 
@@ -183,7 +191,9 @@ export class StreamerbotClient {
     if (this.socket?.readyState !== this.socket?.CLOSED) {
       try {
         await this.disconnect();
-      } catch (e) {}
+      } catch (e) {
+        this.logger?.warn('Unexpected error while calling disconnect():', e);
+      }
     }
 
     this._explicitlyClosed = false;
@@ -191,47 +201,63 @@ export class StreamerbotClient {
     this._connectController.abort();
     this._connectController = new AbortController();
     const controller = new AbortController();
+    const { signal } = controller;
 
-    this._connectController.signal.addEventListener('abort', () => {
-      controller.abort();
-    }, { once: true });
-
-    return await withTimeout(new Promise<void>(async (res, rej) => {
-      try {
-        if (this.options.password) this._authEnabled = true;
-
-        const uri = `${this.options.scheme}://${this.options.host}:${this.options.port}${this.options.endpoint}`;
-        this.logger?.debug('Connecting to Streamer.bot WebSocket server at', uri, this._authEnabled ? 'with authentication' : '');
-
-        this.socket = !!globalThis?.process?.versions?.node ? new (await import('ws')).WebSocket(uri) : new WebSocket(uri);
-
-        this.socket.onmessage = this.onMessage.bind(this);
-        this.socket.onopen = this.onOpen.bind(this);
-        this.socket.onclose = this.onClose.bind(this);
-        this.socket.onerror = this.onError.bind(this);
-
-        this.socket.addEventListener('open', () => {
-          if (!this.socket) return rej(new Error('WebSocket not initialized'));
-          res();
-        }, { signal: controller.signal });
-
-        this.socket.addEventListener('close', () => {
-          return rej(new Error('WebSocket closed'));
-        }, { once: true });
-      } catch (error) {
-        try {
-          await this.disconnect();
-          this?.options?.onError?.(error as Error);
-        } catch (e) {
-          this.logger?.warn('Error invoking onError handler', e);
-        }
-        rej(error);
-      }
-    }), {
-      timeout,
-      message: 'WebSocket connection timeout exceeded',
-      controller,
+    this._connectController.signal.addEventListener('abort', () => controller.abort(), {
+      once: true,
+      signal,
     });
+
+    return await withTimeout(
+      new Promise<void>((res, rej) => {
+        try {
+          if (this.options.password) this._authEnabled = true;
+
+          const uri = `${this.options.scheme}://${this.options.host}:${this.options.port}${this.options.endpoint}`;
+          this.logger?.debug(
+            'Connecting to Streamer.bot WebSocket server at',
+            uri,
+            this._authEnabled ? 'with authentication' : '',
+          );
+
+          this.socket = new WebSocket(uri);
+
+          this.socket.onmessage = this.onMessage.bind(this);
+          this.socket.onopen = this.onOpen.bind(this);
+          this.socket.onclose = this.onClose.bind(this);
+          this.socket.onerror = this.onError.bind(this);
+
+          this.socket.addEventListener(
+            'open',
+            () => {
+              if (!this.socket) return rej(new Error('WebSocket not initialized'));
+              res();
+            },
+            { once: true, signal },
+          );
+
+          this.socket.addEventListener(
+            'close',
+            () => {
+              return rej(new Error('WebSocket closed'));
+            },
+            { once: true, signal },
+          );
+        } catch (error) {
+          this.disconnect().catch((e) =>
+            this.logger?.warn('Unexpected error while calling disconnect():', e),
+          );
+          this?.options?.onError?.(error as Error);
+          rej(error);
+        }
+      }),
+      {
+        timeout,
+        message: 'WebSocket connection timeout exceeded',
+        controller,
+        signal: this._connectController.signal,
+      },
+    );
   }
 
   /**
@@ -240,30 +266,45 @@ export class StreamerbotClient {
   public async disconnect(code: number = 1000, timeout: number = 1_000): Promise<void> {
     this._explicitlyClosed = true;
     this._connectController.abort();
-    this._reconnectTimeout && clearTimeout(this._reconnectTimeout);
+    if (this._reconnectTimeout) clearTimeout(this._reconnectTimeout);
     if (!this.socket || this.socket.readyState === this.socket.CLOSED) return;
 
     const controller = new AbortController();
     const signal = controller.signal;
 
-    return await withTimeout(new Promise<void>((res, rej) => {
-      this.socket?.addEventListener('close', () => {
-        this.logger?.debug('Disconnected from Streamer.bot WebSocket server');
-        res();
-      }, { signal });
-
-      if (this.socket?.readyState !== this.socket?.CLOSING) {
-        try {
-          this.socket?.close(code);
-        } catch (error) {
-          rej(error);
-        }
-      }
-    }), {
-      timeout,
-      message: 'Timeout exceeded while closing connection',
-      controller,
+    this._connectController.signal.addEventListener('abort', () => controller.abort(), {
+      once: true,
+      signal,
     });
+
+    return await withTimeout(
+      new Promise<void>((res, rej) => {
+        if (!this.socket) return;
+
+        this.socket.addEventListener(
+          'close',
+          () => {
+            this.logger?.debug('Disconnected from Streamer.bot WebSocket server');
+            res();
+          },
+          { signal },
+        );
+
+        if (this.socket.readyState !== this.socket.CLOSING) {
+          try {
+            this.socket?.close(code);
+          } catch (error) {
+            rej(error);
+          }
+        }
+      }),
+      {
+        timeout,
+        message: 'Timeout exceeded while closing connection',
+        controller,
+        signal: this._connectController.signal,
+      },
+    );
   }
 
   private async handshake(): Promise<void> {
@@ -272,42 +313,49 @@ export class StreamerbotClient {
     const controller = new AbortController();
     const { signal } = controller;
 
-    this._connectController.signal.addEventListener('abort', () => {
-      controller.abort();
-    }, { once: true, signal });
+    this._connectController.signal.addEventListener('abort', () => controller.abort(), {
+      once: true,
+      signal,
+    });
 
     const response = await withTimeout(
       new Promise<StreamerbotHelloRequest | StreamerbotInfo>((res, rej) => {
-        this.socket?.addEventListener('message', async (event: any) => {
-          if (!('data' in event) || !event.data || typeof event.data !== 'string') {
-            this.logger?.debug('Unknown message received', event);
-            return;
-          }
+        if (!this.socket) return;
 
-          try {
-            const payload = JSON.parse(event.data);
-            if (payload && 'info' in payload) {
-              res(payload);
+        this.socket.addEventListener(
+          'message',
+          async (event: any) => {
+            if (!('data' in event) || !event.data || typeof event.data !== 'string') {
+              this.logger?.debug(`Unknown message received :: ${typeof event}`);
+              return;
             }
-          } catch (e) {
-            this.logger?.warn('Invalid JSON payload received', event.data);
-            rej(e);
-          }
-        }, { signal });
+
+            try {
+              const payload = JSON.parse(event.data);
+              if (payload && 'info' in payload) {
+                res(payload);
+              }
+            } catch (e) {
+              this.logger?.warn('Invalid JSON payload received', event.data);
+              rej(e);
+            }
+          },
+          { signal },
+        );
       }),
       {
         timeout: 5_000,
         message: 'Handshake timeout exceeded',
         controller,
-      }
+        signal: this._connectController.signal,
+      },
     );
 
     if (!response || !('info' in response)) throw new Error('Handshake failed (invalid payload)');
 
     if ('request' in response && response?.request === 'Hello' && response.authentication) {
       return await this.authenticate(response as StreamerbotHelloRequest);
-    }
-    else if (response.info && !response.authentication) {
+    } else if (response.info && !response.authentication) {
       this.logger?.debug('Connected to Streamer.bot WebSocket server', response.info);
       this.info = response.info;
       this.version = response.info.version;
@@ -319,7 +367,9 @@ export class StreamerbotClient {
 
   private async authenticate(data: StreamerbotHelloRequest): Promise<void> {
     if (!this._authEnabled || !this.options.password) {
-      this.logger?.debug('No password provided for authentication. Checking if auth is enforced for all requests...');
+      this.logger?.debug(
+        'No password provided for authentication. Checking if auth is enforced for all requests...',
+      );
       const res = await this.getInfo();
       if (res.status === 'ok') {
         this._authenticated = false;
@@ -339,7 +389,7 @@ export class StreamerbotClient {
 
     this.logger?.debug('Authenticating with Streamer.bot WebSocket server...');
 
-    const { salt, challenge } = data?.authentication;
+    const { salt, challenge } = data.authentication;
     const secret = await sha256base64(`${this.options.password}${salt}`);
     const authentication = await sha256base64(`${secret}${challenge}`);
 
@@ -360,12 +410,14 @@ export class StreamerbotClient {
 
   protected async onOpen(): Promise<void> {
     this._retried = 0;
-    this._reconnectTimeout && clearTimeout(this._reconnectTimeout);
+    if (this._reconnectTimeout) clearTimeout(this._reconnectTimeout);
 
     try {
       // Force a getInfo call for backwards compat with Streamer.bot v0.2.4 and older
       if (!this._authEnabled) {
-        void this.getInfo().catch(() => this.logger?.debug('Failed to fetch Streamer.bot instance info'));
+        void this.getInfo().catch(() =>
+          this.logger?.debug('Failed to fetch Streamer.bot instance info'),
+        );
       }
       await this.handshake();
 
@@ -376,16 +428,26 @@ export class StreamerbotClient {
       }
     } catch (err) {
       this.logger?.warn('Failed handshake with Streamer.bot', err);
-      this.options?.onError?.(err instanceof Error ? err : new Error('Failed handshake with Streamer.bot'));
+      this.options?.onError?.(
+        err instanceof Error ? err : new Error('Failed handshake with Streamer.bot'),
+      );
       return await this.disconnect();
     }
 
     try {
       // Subscribe to initial subscriptions requested in client options
-      if (this.options.subscribe === '*' || (typeof this.options.subscribe === 'object' && !Array.isArray(this.options.subscribe) && Object.keys(this.options.subscribe ?? {}).length)) {
+      if (
+        this.options.subscribe === '*' ||
+        (typeof this.options.subscribe === 'object' &&
+          !Array.isArray(this.options.subscribe) &&
+          Object.keys(this.options.subscribe ?? {}).length)
+      ) {
         this.logger?.debug('Subscribing to initial events from options:', this.options.subscribe);
         await this.subscribe(this.options.subscribe);
-      } else if (typeof this.options.subscribe === 'string' || Array.isArray(this.options.subscribe)) {
+      } else if (
+        typeof this.options.subscribe === 'string' ||
+        Array.isArray(this.options.subscribe)
+      ) {
         this.logger?.debug('Subscribing to initial events from options:', this.options.subscribe);
         const subscriptions = await this.getSubscriptionsFromEventStrings(this.options.subscribe);
         this.logger?.debug('Parsed subscriptions from options:', subscriptions);
@@ -430,17 +492,20 @@ export class StreamerbotClient {
       (this.options.retries < 0 || this._retried < this.options.retries)
     ) {
       if (this._reconnectTimeout) clearTimeout(this._reconnectTimeout);
-      this._reconnectTimeout = setTimeout(async () => {
-        if (!!this.socket && this.socket.readyState !== this.socket.CLOSED) return;
-        this.logger?.debug(`Reconnecting... (attempt ${this._retried})`);
-        try {
-          await this.connect(10_000);
-        } catch (e) {
-          if (this._retried) this.logger?.warn(`Failed to reconnect (attempt ${this._retried - 1})`, e);
-        }
-      }, Math.min(30_000, this._retried * 1_000));
-    }
-    else {
+      this._reconnectTimeout = setTimeout(
+        async () => {
+          if (!!this.socket && this.socket.readyState !== this.socket.CLOSED) return;
+          this.logger?.debug(`Reconnecting... (attempt ${this._retried})`);
+          try {
+            await this.connect(10_000);
+          } catch (e) {
+            if (this._retried)
+              this.logger?.warn(`Failed to reconnect (attempt ${this._retried - 1})`, e);
+          }
+        },
+        Math.min(30_000, this._retried * 1_000),
+      );
+    } else {
       this.logger?.debug('Auto-reconnect limit reached. Cleaning up...');
       this.cleanup();
     }
@@ -448,7 +513,7 @@ export class StreamerbotClient {
 
   protected async onMessage(event: MessageEvent): Promise<void> {
     if (!event.data || typeof event.data !== 'string') {
-      this.logger?.debug('Unknown message received', event);
+      this.logger?.debug('Unknown message received', event, event.data);
       return;
     }
 
@@ -488,7 +553,10 @@ export class StreamerbotClient {
         try {
           listener.callback(payload);
         } catch (e) {
-          this.logger?.warn(`Error occurred within user-provided event callback (${listener.events})`, e);
+          this.logger?.warn(
+            `Error occurred within user-provided event callback (${listener.events})`,
+            e,
+          );
         }
       }
     }
@@ -523,7 +591,7 @@ export class StreamerbotClient {
   /**
    * Send a raw object to the Streamer.bot WebSocket
    */
-  public send(data: Object): void {
+  public send(data: object): void {
     this.socket?.send(JSON.stringify(data));
   }
 
@@ -534,7 +602,7 @@ export class StreamerbotClient {
   public async request<T extends StreamerbotResponseTypes>(
     request: StreamerbotRequest,
     id: string = '',
-    timeout: number = 10_000
+    timeout: number = 10_000,
   ): Promise<T> {
     if (!this.socket || this.socket.readyState !== this.socket.OPEN) {
       throw new Error('WebSocket is not connected');
@@ -545,36 +613,46 @@ export class StreamerbotClient {
     const controller = new AbortController();
     const signal = controller.signal;
 
-    this._connectController.signal.addEventListener('abort', () => {
-      controller.abort();
-    }, { once: true, signal });
-
-    const response = await withTimeout(new Promise<T>((res, rej) => {
-      this.socket?.addEventListener('message', (event: any) => {
-        if (!('data' in event) || !event.data || typeof event.data !== 'string') {
-          this.logger?.debug('Unknown message received', event.data);
-          return;
-        }
-
-        try {
-          const payload = JSON.parse(event?.data);
-          if (payload?.id === id) {
-            this.logger?.verbose(`RECV :: ${request.request}`, payload);
-            return res(payload);
-          }
-        } catch (e) {
-          this.logger?.warn('Invalid JSON payload received', event.data);
-          rej(e);
-        }
-      }, { signal });
-      this.logger?.verbose(`SEND :: ${request.request}`, { ...request, id });
-      this.send({ ...request, id });
-    }), {
-      timeout,
-      message: 'Request timed out',
-      controller,
+    this._connectController.signal.addEventListener('abort', () => controller.abort(), {
+      once: true,
       signal,
     });
+
+    const response = await withTimeout(
+      new Promise<T>((res, rej) => {
+        if (!this.socket) return;
+
+        this.socket.addEventListener(
+          'message',
+          (event: any) => {
+            if (!('data' in event) || !event.data || typeof event.data !== 'string') {
+              this.logger?.debug('Unknown message received', event.data);
+              return;
+            }
+
+            try {
+              const payload = JSON.parse(event?.data);
+              if (payload?.id === id) {
+                this.logger?.verbose(`RECV :: ${request.request}`, payload);
+                return res(payload);
+              }
+            } catch (e) {
+              this.logger?.warn('Invalid JSON payload received', event.data);
+              rej(e);
+            }
+          },
+          { signal },
+        );
+        this.logger?.verbose(`SEND :: ${request.request}`, { ...request, id });
+        this.send({ ...request, id });
+      }),
+      {
+        timeout,
+        message: 'Request timed out',
+        controller,
+        signal: this._connectController.signal,
+      },
+    );
 
     if (response?.status === 'ok') {
       // onData handler
@@ -611,7 +689,11 @@ export class StreamerbotClient {
    */
   public async on<TEvent>(
     event: TEvent extends StreamerbotEventName ? TEvent : StreamerbotEventName | '*',
-    listener: (data: StreamerbotEventPayload<TEvent extends StreamerbotEventName ? TEvent : StreamerbotEventName>) => void
+    listener: (
+      data: StreamerbotEventPayload<
+        TEvent extends StreamerbotEventName ? TEvent : StreamerbotEventName
+      >,
+    ) => void,
   ): Promise<void> {
     try {
       if (!event) return;
@@ -629,9 +711,9 @@ export class StreamerbotClient {
         await this.subscribe(subscriptions);
       }
 
-      this.logger?.debug(`Added event listener for "${event}"`);
+      this.logger?.debug(`LISTEN :: ${event}`);
     } catch (e) {
-      this.logger?.warn(`Failed adding event listener for "${event}"`, e);
+      this.logger?.warn(`LISTEN :: ${event} :: Unexpected error while adding listener`, e);
     }
   }
 
@@ -650,9 +732,14 @@ export class StreamerbotClient {
         throw new Error(eventsResponse.status);
       }
       this.supportedEvents = eventsResponse.events as StreamerbotEventsTypeWriteable;
-      this.logger?.debug(`Successfully fetched supported event types for Streamer.bot v${this.version}`);
-    } catch(error) {
-      this.logger?.warn('Failed to fetch supported events from Streamer.bot, falling back to stored events type.', error);
+      this.logger?.debug(
+        `Successfully fetched supported event types for Streamer.bot v${this.version}`,
+      );
+    } catch (error) {
+      this.logger?.warn(
+        'Failed to fetch supported events from Streamer.bot, falling back to stored events type.',
+        error,
+      );
       this.supportedEvents = StreamerbotEvents as StreamerbotEventsTypeWriteable;
     }
   }
@@ -664,12 +751,13 @@ export class StreamerbotClient {
    */
   private async getSupportedEvents(): Promise<StreamerbotEventsTypeWriteable> {
     if (!this.supportedEvents) {
-      this.logger?.warn('Supported event types not yet initialized, fetching from Streamer.bot instance...');
+      this.logger?.warn(
+        'Supported event types not yet initialized, fetching from Streamer.bot instance...',
+      );
       await this.updateSupportedEvents();
     }
-    return this.supportedEvents ?? StreamerbotEvents as StreamerbotEventsTypeWriteable;
+    return this.supportedEvents ?? (StreamerbotEvents as StreamerbotEventsTypeWriteable);
   }
-
 
   /**
    * Extract events from the configured listeners
@@ -678,15 +766,18 @@ export class StreamerbotClient {
    * @return A record mapping event names to their corresponding listener callbacks.
    */
   private getEventsFromListeners(listeners?: typeof this.listeners) {
-    return (listeners ?? this.listeners).reduce((acc, listener) => {
-      listener.events.forEach(event => {
-        if (!acc[event]) {
-          acc[event] = [];
-        }
-        acc[event].push(listener.callback);
-      });
-      return acc;
-    }, {} as Record<StreamerbotEventName | '*', Array<(data: any) => void>>);
+    return (listeners ?? this.listeners).reduce(
+      (acc, listener) => {
+        listener.events.forEach((event) => {
+          if (!acc[event]) {
+            acc[event] = [];
+          }
+          acc[event].push(listener.callback);
+        });
+        return acc;
+      },
+      {} as Record<StreamerbotEventName | '*', Array<(data: any) => void>>,
+    );
   }
 
   /**
@@ -695,7 +786,9 @@ export class StreamerbotClient {
    * @param listeners - Optional array of listeners to parse. If not provided, it uses the current instance's listeners.
    * @returns A StreamerbotEventsSubscription object ready to be used for subscribing to events.
    */
-  private async getSubscriptionsFromListeners(listeners?: typeof this.listeners): Promise<StreamerbotEventsSubscription> {
+  private async getSubscriptionsFromListeners(
+    listeners?: typeof this.listeners,
+  ): Promise<StreamerbotEventsSubscription> {
     const events = this.getEventsFromListeners(listeners);
     return this.getSubscriptionsFromEventStrings(Object.keys(events));
   }
@@ -706,7 +799,9 @@ export class StreamerbotClient {
    * @param events - An array of event strings to parse, e.g. ['Twitch.ChatMessage', 'YouTube.*', '*']
    * @returns A StreamerbotEventsSubscription object mapping event sources to their types.
    */
-  private async getSubscriptionsFromEventStrings(events: string | string[]): Promise<StreamerbotEventsSubscription> {
+  private async getSubscriptionsFromEventStrings(
+    events: string | string[],
+  ): Promise<StreamerbotEventsSubscription> {
     const subscriptions: StreamerbotEventsSubscription = {};
 
     if (typeof events === 'string') {
@@ -733,7 +828,9 @@ export class StreamerbotClient {
    * @param event - The event string to parse, e.g. 'Twitch.ChatMessage', 'YouTube.*', '*'
    * @returns An object containing the event source and types, or undefined if the event is invalid
    */
-  private async parseEventString(event: string): Promise<{ source: StreamerbotEventSource; eventTypes: string[]; }[] | undefined> {
+  private async parseEventString(
+    event: string,
+  ): Promise<{ source: StreamerbotEventSource; eventTypes: string[] }[] | undefined> {
     const supportedEvents = await this.getSupportedEvents();
     if (!event || typeof event !== 'string') {
       this.logger?.warn(`Invalid event subscription requested "${event}"`);
@@ -741,13 +838,12 @@ export class StreamerbotClient {
     }
 
     if (event === '*') {
-      return Object.keys(supportedEvents).map(key => {
+      return Object.keys(supportedEvents).map((key) => {
         const eventSource = key as keyof typeof supportedEvents;
         const eventTypes = supportedEvents[eventSource] ?? [];
         return { source: eventSource, eventTypes };
       });
-    }
-    else {
+    } else {
       const [source, type] = event.split('.', 2);
       if (!source || !type || !(source in supportedEvents)) {
         this.logger?.warn(`Invalid event subscription requested "${event}"`);
@@ -759,7 +855,12 @@ export class StreamerbotClient {
         | StreamerbotEventsTypeWriteable[keyof StreamerbotEventsTypeWriteable][number]
         | '*';
       if (eventType) {
-        return [{ source: eventSource, eventTypes: eventType === '*' ? supportedEvents[eventSource] : [eventType] }];
+        return [
+          {
+            source: eventSource,
+            eventTypes: eventType === '*' ? supportedEvents[eventSource] : [eventType],
+          },
+        ];
       } else {
         this.logger?.warn(`Invalid event type requested "${event}"`);
         return;
@@ -783,7 +884,10 @@ export class StreamerbotClient {
 
       // Skip unknown keys
       if (!(key in supportedEvents)) {
-        this.logger?.warn(`Attempted to subscribe to empty or unknown event source: "${key}"`, Object.keys(events));
+        this.logger?.warn(
+          `Attempted to subscribe to empty or unknown event source: "${key}"`,
+          Object.keys(events),
+        );
         continue;
       }
 
@@ -798,7 +902,9 @@ export class StreamerbotClient {
 
     // Short circuit invalid subscription request
     if (Object.keys(this.subscriptions).length === 0) {
-      this.logger?.warn('No valid events to subscribe to. Please provide valid event sources and types.');
+      this.logger?.warn(
+        'No valid events to subscribe to. Please provide valid event sources and types.',
+      );
       return { id: 'invalid', status: 'error', error: 'No valid events to subscribe to' };
     }
 
@@ -812,7 +918,7 @@ export class StreamerbotClient {
    * Unsubscribe from events you are currently subscribed to
    */
   public async unsubscribe(
-    events: StreamerbotEventsSubscription | '*'
+    events: StreamerbotEventsSubscription | '*',
   ): Promise<UnsubscribeResponse> {
     const supportedEvents = await this.getSupportedEvents();
 
@@ -832,7 +938,7 @@ export class StreamerbotClient {
           if (eventType) {
             if (this.subscriptions[eventSource]?.filter) {
               (this.subscriptions[eventSource] = this.subscriptions[eventSource] as any[])?.filter(
-                (evt: any) => eventType !== evt
+                (evt: any) => eventType !== evt,
               );
             }
           }
@@ -873,7 +979,7 @@ export class StreamerbotClient {
     args?: Record<string, any>,
     options?: Partial<{
       customEventResponse: boolean;
-    }>
+    }>,
   ): Promise<DoActionResponse<T>> {
     if (options?.customEventResponse) return this.doActionWithCustomEventResponse(action, args);
 
@@ -907,23 +1013,27 @@ export class StreamerbotClient {
   private async doActionWithCustomEventResponse<T = Record<string, any>>(
     action: string | Partial<Pick<StreamerbotAction, 'id' | 'name'>>,
     args: Record<string, any> = {},
-    timeout: number = 10_000
+    timeout: number = 10_000,
   ): Promise<DoActionResponse<T>> {
     if (!this.socket || this.socket.readyState !== this.socket.OPEN) {
       throw new Error('WebSocket is not connected');
     }
 
-    const { responseId: sbClientResponse, promise, controller } = withCustomEventResponse<T>({
+    const {
+      responseId: sbClientResponse,
+      promise,
+      controller,
+    } = withCustomEventResponse<T>({
       timeout,
       addEventListener: (event, handler) => this.on(event as any, handler as any),
-      removeEventListener: predicate => {
-        this.listeners = this.listeners.filter(l => !predicate(l));
-      }
+      removeEventListener: (predicate) => {
+        this.listeners = this.listeners.filter((l) => !predicate(l));
+      },
     });
 
     const actionArgs = {
       ...args,
-      sbClientResponse
+      sbClientResponse,
     };
 
     try {
@@ -1014,9 +1124,10 @@ export class StreamerbotClient {
     args?: Record<string, any>,
     options?: Partial<{
       customEventResponse: boolean;
-    }>
+    }>,
   ): Promise<ExecuteCodeTriggerResponse> {
-    if (options?.customEventResponse) return this.executeCodeTriggerWithCustomEventResponse(triggerName, args);
+    if (options?.customEventResponse)
+      return this.executeCodeTriggerWithCustomEventResponse(triggerName, args);
 
     return await this.request<ExecuteCodeTriggerResponse>({
       request: 'ExecuteCodeTrigger',
@@ -1036,23 +1147,27 @@ export class StreamerbotClient {
   private async executeCodeTriggerWithCustomEventResponse<T = Record<string, any>>(
     triggerName: string,
     args: Record<string, any> = {},
-    timeout: number = 10_000
+    timeout: number = 10_000,
   ): Promise<ExecuteCodeTriggerResponse<T>> {
     if (!this.socket || this.socket.readyState !== this.socket.OPEN) {
       throw new Error('WebSocket is not connected');
     }
 
-    const { responseId: sbClientResponse, promise, controller } = withCustomEventResponse<T>({
+    const {
+      responseId: sbClientResponse,
+      promise,
+      controller,
+    } = withCustomEventResponse<T>({
       timeout,
       addEventListener: (event, handler) => this.on(event as any, handler as any),
-      removeEventListener: predicate => {
-        this.listeners = this.listeners.filter(l => !predicate(l));
-      }
+      removeEventListener: (predicate) => {
+        this.listeners = this.listeners.filter((l) => !predicate(l));
+      },
     });
 
     const triggerArgs = {
       ...args,
-      sbClientResponse
+      sbClientResponse,
     };
 
     try {
@@ -1088,14 +1203,16 @@ export class StreamerbotClient {
     return await this.request<GetCommandsResponse>({
       request: 'GetCommands',
     });
-  };
+  }
 
   /**
    * Get emotes for the selected platform
    *
    * @version 0.2.5
    */
-  public async getEmotes(platform: StreamerbotPlatform): Promise<TwitchGetEmotesResponse | YouTubeGetEmotesResponse> {
+  public async getEmotes(
+    platform: StreamerbotPlatform,
+  ): Promise<TwitchGetEmotesResponse | YouTubeGetEmotesResponse> {
     switch (platform) {
       case 'twitch':
         return await this.request<TwitchGetEmotesResponse>({
@@ -1129,10 +1246,10 @@ export class StreamerbotClient {
    * @param name The name of the global variable to fetch
    * @param persisted Whether the global variable is persisted
    */
-  public async getGlobal<
-    T extends StreamerbotVariableValue,
-    K extends string = string
-  >(name: K, persisted = true) {
+  public async getGlobal<T extends StreamerbotVariableValue, K extends string = string>(
+    name: K,
+    persisted = true,
+  ) {
     const response = await this.request<GetGlobalResponse<T, K>>({
       request: 'GetGlobal',
       variable: name,
@@ -1160,17 +1277,17 @@ export class StreamerbotClient {
   public async getUserGlobals<
     T extends StreamerbotVariableValue,
     K extends string = string,
-    P extends StreamerbotPlatform = StreamerbotPlatform
+    P extends StreamerbotPlatform = StreamerbotPlatform,
   >(
     platform: P,
     name: K | null = null,
-    persisted = true
+    persisted = true,
   ): Promise<GetUserGlobalsResponse<T, K, P>> {
     const platformToRequest: Record<StreamerbotPlatform, StreamerbotRequestName> = {
-      'twitch': 'TwitchGetUserGlobals',
-      'youtube': 'YouTubeGetUserGlobals',
-      'trovo': 'TrovoGetUserGlobals',
-      'kick': 'KickGetUserGlobals',
+      twitch: 'TwitchGetUserGlobals',
+      youtube: 'YouTubeGetUserGlobals',
+      trovo: 'TrovoGetUserGlobals',
+      kick: 'KickGetUserGlobals',
     };
     const request = platformToRequest[platform];
     if (!request) throw new Error('Invalid platform');
@@ -1196,17 +1313,12 @@ export class StreamerbotClient {
     K extends string = string,
     U extends string = string,
     P extends StreamerbotPlatform = StreamerbotPlatform,
-  >(
-    platform: P,
-    userId: U,
-    name: K | null = null,
-    persisted = true
-  ) {
+  >(platform: P, userId: U, name: K | null = null, persisted = true) {
     const platformToRequest: Record<StreamerbotPlatform, StreamerbotRequestName> = {
-      'twitch': 'TwitchGetUserGlobal',
-      'youtube': 'YouTubeGetUserGlobal',
-      'trovo': 'TrovoGetUserGlobal',
-      'kick': 'KickGetUserGlobal',
+      twitch: 'TwitchGetUserGlobal',
+      youtube: 'YouTubeGetUserGlobal',
+      trovo: 'TrovoGetUserGlobal',
+      kick: 'KickGetUserGlobal',
     };
     const request = platformToRequest[platform];
     if (!request) throw new Error('Invalid platform');
@@ -1243,12 +1355,16 @@ export class StreamerbotClient {
   public async sendMessage(
     platform: StreamerbotPlatform,
     message: string,
-    { bot = false, internal = true, ...options }: {
+    {
+      bot = false,
+      internal = true,
+      ...options
+    }: {
       bot?: boolean;
       internal?: boolean;
       replyId?: string;
       broadcastId?: string;
-    } = {}
+    } = {},
   ): Promise<SendMessageResponse> {
     if (!this._authenticated) {
       return {
@@ -1279,7 +1395,6 @@ export class StreamerbotClient {
       request: 'SendMessage',
     });
   }
-
 
   /**
    * Retrieves the pronouns of a user from the specified platform.

@@ -22,9 +22,9 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
       "require": "./dist/index.cjs",
-      "types": "./dist/index.d.ts",
       "browser": "./dist/streamerbot-client.js"
     }
   },
@@ -33,19 +33,18 @@
   ],
   "scripts": {
     "dev": "pnpm build --watch",
-    "build": "tsup",
-    "build:browser": "tsup --config tsup.browser.config.ts",
+    "build": "tsdown",
+    "test": "vitest run",
     "lint": "tsc",
-    "prepublishOnly": "pnpm build && pnpm build:browser"
+    "prepublishOnly": "pnpm build"
   },
   "devDependencies": {
-    "@types/ws": "^8.18.1",
-    "tsup": "^8.5.0",
-    "typescript": "^5.8.3"
+    "@types/node": "^24.13.3",
+    "tsdown": "^0.22.12",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.10"
   },
   "dependencies": {
-    "bufferutil": "^4.0.9",
-    "uncrypto": "^0.1.3",
-    "ws": "^8.18.3"
+    "uncrypto": "^0.1.3"
   }
 }
