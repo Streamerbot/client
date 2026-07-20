@@ -1,5 +1,24 @@
 # @streamerbot/node-client-demo
 
+## 2.0.0
+
+### Major Changes
+
+- ## Breaking change for NodeJS
+
+  This library is now using native node WebSocket (available in Node v24 by default) by default.
+  The older "ws" dependency has been fully removed.
+
+  Streamer.bot v1.0.5 (currently in alpha) is also required to use this version with NodeJS clients.
+  Please update your streamer.bot installation to v1.0.5 or later before updating to this version of the client.
+
+  **Frontend web/browser clients are unaffected by this change and will continue to work as before.**
+
+### Patch Changes
+
+- Updated dependencies
+  - @streamerbot/client@2.0.0
+
 ## 1.12.2
 
 ### Patch Changes
