@@ -21,7 +21,7 @@
     "@streamerbot/vue": "workspace:^",
     "@vueuse/nuxt": "^14.3.0",
     "better-sqlite3": "^12.11.1",
-    "docus": "latest",
+    "docus": "^5.12.3",
     "nuxt": "^4.5.0",
     "nuxt-link-checker": "^5.1.3",
     "nuxt-og-image": "^6.7.3",
