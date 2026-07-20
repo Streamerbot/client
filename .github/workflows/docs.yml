@@ -5,7 +5,7 @@ on:
   push:
     branches: ["main"]
     paths:
-    - apps/docs/**
+      - apps/docs/**
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -26,29 +26,35 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      NUXT_HOST: 0.0.0.0
+      NUXT_PUBLIC_SITE_URL: "https://streamerbot.github.io/client"
+
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@v6
+        name: Install pnpm
         with:
-          node-version: 20
-          cache: pnpm
+          run_install: false
 
-      - name: Create .env
-        uses: SpicyPizza/create-envfile@v2.0
+      - name: Install Node.js
+        uses: actions/setup-node@v6
         with:
-          directory: './apps/docs'
-          envkey_NUXT_PUBLIC_SITE_URL: https://streamerbot.github.io/client
-          envkey_NUXT_HOST: 0.0.0.0
-          envkey_NUXT_UI_PRO_LICENSE: ${{ secrets.NUXT_UI_PRO_LICENSE }}
+          node-version: 24
+          cache: "pnpm"
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
+
+      - uses: actions/cache@v5
+        name: Cache compiled nuxt output
+        with:
+          path: |
+            .nuxt
+            .output
+          key: ${{ runner.os }}-nuxt
 
       - name: Build @streamerbot/client
         run: pnpm --filter @streamerbot/client build
@@ -74,4 +80,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
