@@ -1,40 +1,71 @@
 <script setup lang="ts">
-import { useSeo } from '~/composables/useSeo';
+const links = [
+  {
+    label: 'Get Started',
+    to: '/get-started/installation',
+    icon: 'i-heroicons-rocket-launch',
+    size: 'lg',
+    variant: 'subtle',
+  },
+  {
+    label: 'Open on GitHub →',
+    to: 'https://github.com/streamerbot/client',
+    icon: 'i-mdi-github',
+    target: '_blank',
+    color: 'neutral',
+    variant: 'ghost',
+  },
+];
 
-const route = useRoute()
-const { data: page } = await useAsyncData('index', () => queryContent(route.path).findOne())
-if (!page.value) throw createError({ statusCode: 404 });
+const features = [
+  {
+    title: 'Execute Actions',
+    description: 'Trigger immediate action executions on your Streamer.bot instance',
+    icon: 'i-mdi-lightning-bolt',
+  },
+  {
+    title: 'Subscribe to Events',
+    description:
+      'Easily subscribe to real-time event data from all connected services in Streamer.bot',
+    icon: 'i-mdi-creation',
+  },
+  {
+    title: 'TypeScript Architecture',
+    description: 'Harness the full power of type-safety and IDE autocompletion',
+    icon: 'i-vscode-icons-file-type-typescript',
+  },
+];
 
-useSeo(page);
+const code = `
+::code-group
+\`\`\` [pnpm]
+pnpm install @streamerbot/client
+\`\`\`
+\`\`\` [npm]
+npm install @streamerbot/client
+\`\`\`
+\`\`\` [yarn]
+yarn add @streamerbot/client
+\`\`\`
+::
+`;
 </script>
 
 <template>
-  <div>
-    <ULandingHero orientation="horizontal">
-      <template #title>
-        {{ page.title }}
-      </template>
+  <UPageHero
+    orientation="horizontal"
+    title="Streamer.bot Client"
+    description="Official client for interacting with the Streamer.bot WebSocket API"
+    :links
+  >
+    <MDC :value="code" />
+  </UPageHero>
 
-      <template #description>
-        <span>{{ page.description }}</span>
-      </template>
-
-      <template #links>
-        <UButton v-for="link in page.hero.links" :key="link.to" v-bind="link" />
-      </template>
-
-      <template #default>
-        <div class="gradient" />
-        <MDC :value="page.hero.code" tag="pre" class="prose prose-primary dark:prose-invert mx-auto" />
-      </template>
-    </ULandingHero>
-
-    <ULandingSection
-      title="Real-time interaction with ease"
-      description="Build your own browser sources, overlays, or even full-blown NodeJS applications taking advantage of real-time data from Streamer.bot "
-      :features="page.features || []"
-    />
-  </div>
+  <UPageSection
+    title="Real-time interaction with ease"
+    description="Build your own browser sources, overlays, or even full-blown NodeJS applications taking advantage of real-time data from Streamer.bot "
+    :features
+  />
 </template>
 
 <style scoped>

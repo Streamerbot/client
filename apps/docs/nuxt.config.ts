@@ -1,25 +1,17 @@
 export default defineNuxtConfig({
-  extends: ['@nuxt/ui-pro'],
+  extends: ['docus'],
 
-  modules: [
-    '@nuxt/ui',
-    '@vueuse/nuxt',
-    'nuxt-og-image',
-    'nuxt-link-checker',
-    '@nuxt/content',
-    // '@nuxt/image',
-    '@nuxt/fonts'
-  ],
+  modules: ['@vueuse/nuxt', 'nuxt-og-image', 'nuxt-link-checker'],
 
   app: {
-    baseURL: '/client',
+    baseURL: '/client/',
     head: {
       link: [{ rel: 'icon', type: 'image/png', href: '/client/favicon.ico' }],
     },
   },
 
   site: {
-    url: 'https://streamerbot.github.io/client',
+    url: 'https://streamerbot.github.io/',
     name: 'Streamer.bot WebSocket Client',
     twitterCard: 'summary_large_image',
   },
@@ -29,38 +21,7 @@ export default defineNuxtConfig({
     fallback: 'dark',
   },
 
-  content: {
-    navigation: {
-      fields: [
-        'icon',
-        'titleTemplate',
-        'header',
-        'main',
-        'aside',
-        'footer',
-        'category',
-        'version',
-        'badge',
-      ],
-    },
-    highlight: {
-      preload: [
-        'js',
-        'ts',
-        'csharp',
-        'bash',
-        'json',
-        'yaml',
-        'markdown',
-        'html',
-        'css',
-        'scss',
-        'less',
-        'xml',
-        'diff',
-      ],
-    },
-  },
+  css: ['~/assets/css/main.css'],
 
   nitro: {
     routeRules: {
@@ -71,36 +32,46 @@ export default defineNuxtConfig({
     },
     prerender: {
       crawlLinks: true,
-      routes: ['/api/search.json'],
     },
   },
 
   ogImage: {
-    runtimeCacheStorage: true,
+    zeroRuntime: true, // Set to true when prerendering all pages for static hosting
+    runtimeCacheStorage: {
+      driver: 'fs',
+      base: '.data/og-image-cache',
+    },
     defaults: {
-      cacheMaxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+      cacheMaxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
     },
   },
 
-  linkChecker: {
-    enabled: false,
-    showLiveInspections: true,
-    fetchRemoteUrls: false,
-    report: {
-      html: true,
-      markdown: true,
-    },
+  fonts: {
+    families: [
+      { name: 'DM Sans', global: true },
+      // Explicitly define weights and set as global for OgImage rendering
+      { name: 'Jost', weights: [200, 300, 400, 500, 600, 700], global: true },
+      { name: 'DM Mono', weights: [300, 400, 500], global: true },
+    ],
   },
 
   future: {
     compatibilityVersion: 4,
   },
 
-  compatibilityDate: '2024-09-25',
+  compatibilityDate: '2026-07-09',
+
+  vite: {
+    optimizeDeps: {
+      include: [],
+    },
+  },
 
   $development: {
+    debug: false,
+    sourcemap: true,
     devtools: {
       enabled: true,
     },
-  }
+  },
 });

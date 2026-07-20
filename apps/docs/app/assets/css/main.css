@@ -1,0 +1,19 @@
+@import 'tailwindcss';
+@import '@nuxt/ui';
+
+@source "../../../content/**/*";
+@source "../../**/*.vue";
+
+@theme {
+  --font-sans: DM Sans, ui-sans-serif, system-ui, sans-serif;
+  --font-logo: Jost, Jost fallback, ui-sans-serif, system-ui, sans-serif;
+  --font-mono: DM Mono, DM Mono fallback, ui-monospace, monospace;
+}
+
+:root {
+  --ui-container: 90rem;
+}
+
+.shiki .line.highlighted {
+  background-color: var(--ui-bg-accented);
+}

@@ -60,7 +60,7 @@ const links: Array<{
   <UPopover class="relative">
     <template #default="{ open }">
       <UButton
-        :color="null"
+        variant="link"
         size="sm"
         class="pl-0"
       >
@@ -79,7 +79,7 @@ const links: Array<{
         />
       </UButton>
     </template>
-    <template #panel="{ close }">
+    <template #content="{ close }">
       <div
         class="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
       >
