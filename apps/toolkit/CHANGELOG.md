@@ -75,7 +75,7 @@
 
 ### Minor Changes
 
-- Add custom event response helpers, fix straggling event listner bug
+- Add custom event response helpers, fix straggling event listener bug
 
 ### Patch Changes
 
