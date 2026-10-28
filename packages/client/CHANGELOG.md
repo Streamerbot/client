@@ -48,7 +48,7 @@
 
 ### Minor Changes
 
-- Add custom event response helpers, fix straggling event listner bug
+- Add custom event response helpers, fix straggling event listener bug
 
 ## 1.9.5
 

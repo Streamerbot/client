@@ -225,7 +225,7 @@ function groupByHeading(children: any[]) {
   let hash = ''; // file.page with potential `#anchor` concat
   let title: string | null;
   for (const node of children) {
-    // if heading found, udpate current path
+    // if heading found, update current path
     if (['h2', 'h3'].includes(node.tag)) {
       // find heading text value
       title = node.children

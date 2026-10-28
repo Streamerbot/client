@@ -54,7 +54,7 @@ export function useStreamerbot(options: UseStreamerbotOptions): UseStreamerbotRe
   }
 
   function onError(err: Error) {
-    error.value = err?.message ?? 'Unkown Error';
+    error.value = err?.message ?? 'Unknown Error';
     status.value = 'CLOSED';
     let cb = toValue(_options.value).onError;
     cb?.(err);
